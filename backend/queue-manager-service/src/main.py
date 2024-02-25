@@ -43,9 +43,9 @@ app = FastAPI(
 app.include_router(
     queues.router, prefix='/queues/api/v1', tags=['films_queues']
 )
-# app.include_router(
-#     websocket.router, prefix="/notifications/api/v1", tags=["push_notifications"]
-# )
+app.include_router(
+    websocket.router, prefix="/waiting_party/api/v1", tags=['waiting_party']
+)
 
 
 if __name__ == "__main__":

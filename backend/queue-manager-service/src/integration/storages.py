@@ -18,6 +18,10 @@ class IStorage(ABC):
         pass
 
     @abstractmethod
+    async def delete(self, key: str) -> None:
+        pass
+
+    @abstractmethod
     async def close(self):
         pass
 
@@ -31,6 +35,9 @@ class RedisStorage(IStorage):
 
     async def set(self, key: str, value: Any, expired_time: int) -> None:
         await self.connection.set(key, value, expired_time)
+
+    async def delete(self, key: str) -> None:
+        await self.connection.delete(key)
 
     async def close(self):
         await self.connection.close()

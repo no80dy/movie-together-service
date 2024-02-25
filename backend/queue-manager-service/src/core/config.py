@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     auth_service_url: str = "http://auth:8000/auth/api/v1/users"
 
     # sentry_dsn: str
+    rabbitmq_exchange_name: str = 'films_queues'
+    rabbitmq_queue_name: str = 'film_queue'
 
 
 settings = Settings()
