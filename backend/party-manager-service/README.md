@@ -32,3 +32,13 @@ const resume_message = {
     "party_id": "uuid"
 };
 ```
+
+Коллекция содержащая информацию о комнатах просмотра фильмов:
+```json
+{
+  "party_id": "uuid",
+  "film_id": "uuid",
+  "users_ids": [],
+  "player_time": "datetime"
+}
+```
