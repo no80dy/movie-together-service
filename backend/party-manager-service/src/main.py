@@ -3,11 +3,26 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from core.config import settings
+from motor.motor_asyncio import AsyncIOMotorClient
+from integration import mongodb, rabbitmq
+from faststream.rabbit import RabbitBroker
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    mongodb.mongo_client = AsyncIOMotorClient(settings.mongodb_url)
+    rabbitmq.rabbitmq_broker = RabbitBroker(
+        host=settings.rabbitmq_host,
+        port=settings.rabbitmq_port,
+        login=settings.rabbitmq_login,
+        password=settings.rabbitmq_password
+    )
+    await rabbitmq.rabbitmq_broker.connect()
+    await rabbitmq.configure_rabbit_queues()
+    await rabbitmq.configure_rabbit_exchange()
     yield
+    await rabbitmq.rabbitmq_broker.close()
+    mongodb.mongo_client.close()
 
 
 app = FastAPI(
