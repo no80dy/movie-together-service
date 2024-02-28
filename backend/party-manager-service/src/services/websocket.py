@@ -21,7 +21,7 @@ class WebSocketConnectionService:
 
     async def connect(self, user_id: uuid.UUID, websocket: WebSocket):
         await websocket.accept()
-        self.storage.find_element_by_properties({""})
+        # self.storage.find_element_by_properties({""})
         self.websocket_router.add_pair_in_table(user_id, websocket)
         while True:
             result = await self.storage.find_element_by_properties(
