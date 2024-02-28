@@ -38,9 +38,10 @@ services:
     depends_on:
       - mongodb
       - minio
-
+    env_file:
+      - ./party-manager-service/src/.env.fastapi
     ports:
-      - "8002:8002"
+      - "8002:8000"
 
   nginx:
     image: nginx:1.19.2
