@@ -35,6 +35,7 @@ class WebSocketConnectionService:
             await websocket.send_json(
                 {"type": "sync", "played_time": played_time}
             )
+            message = await websocket.receive_json()
             # Here will be chatting with users
             # Here will be sending a server video playing time
             await asyncio.sleep(1)

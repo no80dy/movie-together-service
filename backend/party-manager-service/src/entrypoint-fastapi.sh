@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 RABBITMQ_BROKERS=("rabbitmq:5672")
 
 MAX_ATTEMPTS=30
