@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>FILM</title>
+    </head>
+    <body>
+        <h1>film_id = 1530ac24-8123-4db8-85ef-ccce5a3a37f1</h1>
+        <form action="http://localhost/queues/api/v1/film_together" method="post">
+            <input type="text" name="film_id" value="1530ac24-8123-4db8-85ef-ccce5a3a37f1"></input>
+            <button>Film Together</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+    </body>
+    <script>
+        function sendMessage(event) {
+            const res = fetch("http://localhost/queues/api/v1/film_together", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': ' Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDg5NjE3MTQuNDA2Mjk0NiwidXNlcl9pZCI6Ijg2ODMwYTVhLTRiOGMtNGVhMy05MWY2LWEyYjZlMDNiZGM1MCJ9.xElEEk4hZV2DO01RnN0ktSdJGMuTl3nj66T2AMvIrZ0'
+            },
+            body: new FormData(this)
+        });
+        }
+
+    </script>
+</html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--    <head>-->
+<!--        <title>FILM</title>-->
+<!--        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>-->
+<!--    </head>-->
+<!--    <body>-->
+<!--        <h1>film_id = 1530ac24-8123-4db8-85ef-ccce5a3a37f1</h1>-->
+
+<!--        <input id="film_id" type="text" />-->
+<!--        <input id="tokenField" type="text" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDg5NjE3MTQuNDA2Mjk0NiwidXNlcl9pZCI6Ijg2ODMwYTVhLTRiOGMtNGVhMy05MWY2LWEyYjZlMDNiZGM1MCJ9.xElEEk4hZV2DO01RnN0ktSdJGMuTl3nj66T2AMvIrZ0-->
+<!--"/>-->
+<!--        <input id="submitButton" type="button" value="Film Together">-->
+
+<!--        <ul id='messages'>-->
+<!--        </ul>-->
+
+<!--    <script>-->
+<!--        $(document).ready(function() {-->
+<!--            $('#submitButton').on('click',function(){-->
+<!--                $.ajax({-->
+<!--                      url: "http://localhost/queues/api/v1/film_together",-->
+<!--                      type: 'POST',-->
+<!--                      data: {-->
+<!--                              film_id: $('#film_id').val(),-->
+<!--                            },-->
+<!--                      contentType: 'application/json',-->
+<!--                      headers: {-->
+<!--                                "Authorization": "Bearer " + $('#tokenField').val()-->
+<!--                             },-->
+<!--                      async: false-->
+<!--                })-->
+<!--            })-->
+<!--        });-->
+<!--    </script>-->
+<!--    </body>-->
+
+<!--</html>-->
+

@@ -1,25 +1,25 @@
 version: '3'
 include:
-  - ./deploy/postgresql/postgresql-dev.yml
+#  - ./deploy/postgresql/postgresql-dev.yml
   - ./deploy/redis/redis-dev.yml
   - ./deploy/rabbitmq/rabbitmq-dev.yml
-  - ./deploy/mongodb/mongodb-dev.yml
-  - ./deploy/minio/minio-dev.yml
+#  - ./deploy/mongodb/mongodb-dev.yml
+#  - ./deploy/minio/minio-dev.yml
 
 services:
-  auth-service:
-    build:
-      context: ./auth-service/src
-      dockerfile: Dockerfile
-    env_file:
-      - ./auth-service/fastapi.env
-    volumes:
-      - ./auth-service/src/alembic/versions:/app/alembic/versions
-    depends_on:
-      - postgresql
-      - redis
-    ports:
-      - "8000:8000"
+#  auth-service:
+#    build:
+#      context: ./auth-service/src
+#      dockerfile: Dockerfile
+#    env_file:
+#      - ./auth-service/fastapi.env
+#    volumes:
+#      - ./auth-service/src/alembic/versions:/app/alembic/versions
+#    depends_on:
+#      - postgresql
+#      - redis
+#    ports:
+#      - "8000:8000"
 
   queue-manager-service:
     build:
@@ -31,16 +31,16 @@ services:
     ports:
       - "8001:8001"
 
-  party-manager-service:
-    build:
-      context: ./party-manager-service/src
-      dockerfile: Dockerfile
-    depends_on:
-      - mongodb
-      - minio
-
-    ports:
-      - "8002:8002"
+#  party-manager-service:
+#    build:
+#      context: ./party-manager-service/src
+#      dockerfile: Dockerfile
+#    depends_on:
+#      - mongodb
+#      - minio
+#
+#    ports:
+#      - "8002:8002"
 
   nginx:
     image: nginx:1.19.2
@@ -48,6 +48,6 @@ services:
       - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
-      - auth-service
+      - queue-manager-service
     ports:
       - "80:80"
