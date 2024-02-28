@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from api.v1 import websocket, queues
+from api.v1 import websockets, queues
 from core.config import settings
 from fastapi import FastAPI
 from faststream.rabbit import RabbitBroker
@@ -16,6 +16,7 @@ async def lifespan(app: FastAPI):
     redis.redis_client = Redis(
         host=settings.redis_host,
         port=settings.redis_port,
+        decode_responses=True,  # decode binary to str
     )
     rabbitmq.rabbitmq_broker = RabbitBroker(
         host=settings.rabbitmq_host,
@@ -44,7 +45,7 @@ app.include_router(
     queues.router, prefix='/queues/api/v1', tags=['films_queues']
 )
 app.include_router(
-    websocket.router, prefix="/waiting_party/api/v1", tags=['waiting_party']
+    websockets.router, prefix="/waiting_party/api/v1", tags=['waiting_party']
 )
 
 

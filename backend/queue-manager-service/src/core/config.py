@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     rabbitmq_exchange_name: str = 'films_queues'
     rabbitmq_queue_name: str = 'film_queue'
 
+    client_id_key: bytes = b'4BC1BKy5rl2s5XX0EAH9leBzpBfdeYSm8SLa4gG5bn4='
+
 
 settings = Settings()
 

@@ -9,6 +9,11 @@ class FilmTogether(BaseModel):
     user_agent: str
 
 
+# class InputWSPayloads(BaseModel):
+#     film_id: uuid.UUID
+#     client_id: str
+
+
 class PartyMember(BaseModel):
     user_id: uuid.UUID
     user_agent: str

@@ -1,4 +1,3 @@
-import hashlib
 import json
 from functools import lru_cache
 
@@ -7,6 +6,8 @@ from integration.brokers import RabbitMQBroker, get_message_broker
 from integration.storages import RedisStorage, get_storage
 
 from core.config import settings
+from services.client_id import ClientIDService, get_client_id_service
+from services.websocket import WebSocketService, get_websocket_service
 from schemas.entity import FilmTogether, OutputPartyPayloads
 
 
@@ -15,69 +16,61 @@ MAX_PARTY_WAITING_TIME = 10 * 60  # 10 мин
 
 
 class QueueService:
-    def __init__(self, broker: RabbitMQBroker, storage: RedisStorage):
+    def __init__(
+            self,
+            broker: RabbitMQBroker,
+            storage: RedisStorage,
+            client_id_service: ClientIDService = Depends(get_client_id_service)
+    ):
         self.broker = broker
         self.storage = storage
-
-    @staticmethod
-    async def _make_client_id(
-            film_together: FilmTogether
-    ) -> str:
-        """Создание уникального идентификатора для клиента."""
-        film_together_dto = film_together.model_dump()
-        film_id = film_together_dto.get('film_id')
-        user_id = film_together_dto.get('user_id')
-        user_agent = film_together_dto.get('user_agent')
-
-        client_id_raw = str(film_id) + str(user_id) + str(user_agent)
-        return hashlib.sha256(client_id_raw.encode('utf-8')).hexdigest()
+        self.client_id_service = client_id_service
 
     async def check_if_client_id_exist(
             self,
             film_together: FilmTogether
     ) -> bool:
-        client_id = await self._make_client_id(film_together)
-        film_together_dto = FilmTogether.model_dump()
-        film_id = film_together_dto.get('film_id')
+        client_id = self.client_id_service.make_client_id(film_together)
+        film_together_dto = film_together.model_dump()
+        film_id = str(film_together_dto.get('film_id'))
 
-        queue = json.loads(await self.storage.get(film_id))
+        queue = await self.storage.get(film_id)
         if not queue:
             return False
+
+        queue = json.loads(queue)
         members = queue['members']
         members_client_id = [member['client_id'] for member in members]
+        print(members_client_id)
         if client_id in members_client_id:
             return True
         return False
 
     async def handle_queue(
             self,
-            film_together: FilmTogether
+            film_together: FilmTogether,
+            websocket_service: WebSocketService = Depends(get_websocket_service)
     ) -> int:
-        if self.check_if_client_id_exist(film_together):
-            # TODO Редирект на тот же вебсокет
-            pass
-
-        client_id = await self._make_client_id(film_together)
+        client_id = self.client_id_service.make_client_id(film_together)
         film_together_dto = film_together.model_dump()
-        film_id = film_together_dto.get('film_id')
+        film_id = str(film_together_dto.get('film_id'))
         user = {
-            'user_id': film_together_dto.get('user_id'),
+            'user_id': str(film_together_dto.get('user_id')),
             'user_agent': film_together_dto.get('user_agent'),
             'client_id': client_id
         }
 
-        queue = json.loads(await self.storage.get(film_id))
+        queue = await self.storage.get(film_id)
 
         if not queue:
             queue = {
                 'amount': 1,
                 'members': [user]
             }
-            await self.storage.set(film_id, queue, MAX_PARTY_WAITING_TIME)
+            await self.storage.set(film_id, json.dumps(queue), MAX_PARTY_WAITING_TIME)
             return queue['amount']
 
-            # TODO Открыть вебсокет для передачи данных
-
+        queue = json.loads(queue)
         if queue.get('amount') == AMOUNT_MEMBERS_IN_PARTY - 1:
             party = OutputPartyPayloads(
                 film_id=film_id,
@@ -92,10 +85,20 @@ class QueueService:
         else:
             queue['amount'] += 1
             queue['members'].append(user)
-            await self.storage.set(film_id, queue, MAX_PARTY_WAITING_TIME)
+
+            await self.storage.set(film_id, json.dumps(queue), MAX_PARTY_WAITING_TIME)
             return queue['amount']
 
             # TODO Подключится к уже открытому вебсокету. Отправить данные в вебсокет
+
+    async def create_queue(self):
+        pass
+
+    async def add_to_queue(self):
+        pass
+
+    async def remove_from_queue(self):
+        pass
 
 
 @lru_cache
