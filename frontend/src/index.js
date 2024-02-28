@@ -17,7 +17,8 @@ document.body.appendChild(component());
 
 document.addEventListener("DOMContentLoaded", () => {
     const video = document.getElementById("video");
-    const source_host = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+    // const source_host = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+    const source_host = "http://localhost:8000/api/v1/stream/video.m3u8";
     if(Hls.isSupported()) {
         const hls = new Hls();
         const playerOptions = {};
@@ -38,6 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         hls.attachMedia(video);
         window.hls = hls;
+    }
+    else {
+        console.log("HLS is not supported");
     }
     function updateQuality() {
         window.hls.levels.forEach((level, levelIndex) => {

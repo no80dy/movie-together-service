@@ -15,9 +15,9 @@ class PartyManagerService:
 	async def create_party(self, party_creation_message: PartyCreationMessage):
 		await self.storage.insert_element(
 			{
-				"party_id": uuid.uuid4(),
-				"film_id": party_creation_message.film_id,
-				"users_ids": party_creation_message.users_ids
+				"party_id": str(uuid.uuid4()),
+				"film_id": str(party_creation_message.film_id),
+				"users_ids": [str(user_id) for user_id in party_creation_message.users_ids]
 			},
 			"parties"
 		)

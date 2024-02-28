@@ -15,4 +15,3 @@ async def create_party(
 	]
 ):
 	await party_manager_service.create_party(party_creation_message)
-	return {"redirect_url": ""}
