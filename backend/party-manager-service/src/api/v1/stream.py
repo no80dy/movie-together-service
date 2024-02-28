@@ -28,8 +28,7 @@ async def stream_hls_video():
 
         return StreamingResponse(generate(), media_type="application/vnd.apple.mpegurl")
     else:
-        raise ValueError("Video file not found")
-        # return Response(content="Video file not found", status_code=404)
+        return Response(content="Video file not found", status_code=404)
 
 
 @router.get("/{segment}")
