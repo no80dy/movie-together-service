@@ -3,7 +3,7 @@ services:
   fastapi:
     build:
       context: src
-      dockerfile: src/Dockerfile
+      dockerfile: Dockerfile
     env_file:
       - fastapi.env
     volumes:
@@ -11,6 +11,8 @@ services:
     depends_on:
       - database
       - redis
+    ports:
+      - "8000:8000"
 
   redis:
     image: docker.io/bitnami/redis:7.2.1
@@ -24,6 +26,10 @@ services:
     image: postgres:latest
     env_file:
       - ./.env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
