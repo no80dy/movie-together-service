@@ -46,8 +46,8 @@ app.add_middleware(
 )
 
 
-app.include_router(broker.router, prefix="/api/v1/broker", tags=["RabbitMQ"])
-app.include_router(stream.router, prefix="/api/v1/stream", tags=["HLS"])
+app.include_router(broker.router, prefix="/party-manager/api/v1/broker", tags=["RabbitMQ"])
+app.include_router(stream.router, prefix="/party-manager/api/v1/stream", tags=["HLS"])
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

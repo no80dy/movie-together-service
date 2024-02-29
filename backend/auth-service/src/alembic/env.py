@@ -11,10 +11,11 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
+print(os.path.dirname(os.path.dirname(__file__)))
 from db.postgres import Base
 from models.entity import *
 from db.postgres import dsn
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -39,6 +40,8 @@ print(target_metadata)
 # ... etc.
 
 url = dsn
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
