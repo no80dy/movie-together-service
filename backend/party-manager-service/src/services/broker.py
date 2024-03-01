@@ -13,14 +13,27 @@ class PartyManagerService:
 		self.storage = storage
 
 	async def create_party(self, party_creation_message: PartyCreationMessage):
+		party_id = uuid.uuid4()
 		await self.storage.insert_element(
 			{
-				"party_id": str(uuid.uuid4()),
+				"party_id": str(party_id),
 				"film_id": str(party_creation_message.film_id),
 				"users_ids": [str(user_id) for user_id in party_creation_message.users_ids]
 			},
 			"parties"
 		)
+		return party_id
+
+	async def find_party_by_id(
+		self, party_id: uuid.UUID
+	) -> dict:
+		try:
+			return await self.storage.find_element_by_properties(
+				{"party_id": str(party_id)},
+				"parties"
+			)
+		except Exception as e:
+			print(e)
 
 
 @lru_cache

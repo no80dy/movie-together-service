@@ -6,7 +6,7 @@ from core.config import settings
 from motor.motor_asyncio import AsyncIOMotorClient
 from integration import mongodb, rabbitmq
 from faststream.rabbit import RabbitBroker
-from api.v1 import broker, stream
+from api.v1 import film, stream, websockets
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -46,8 +46,9 @@ app.add_middleware(
 )
 
 
-app.include_router(broker.router, prefix="/api/v1/broker", tags=["RabbitMQ"])
+app.include_router(film.router, prefix="/api/v1/broker", tags=["RabbitMQ"])
 app.include_router(stream.router, prefix="/api/v1/stream", tags=["HLS"])
+app.include_router(websockets.router, tags=["WebSockets"])
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

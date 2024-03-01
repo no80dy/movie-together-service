@@ -1,5 +1,8 @@
+import uuid
+
 from typing import Annotated
 from fastapi import APIRouter, Depends
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from schemas.broker import PartyCreationMessage
 from services.broker import PartyManagerService, get_party_manager_service
@@ -14,4 +17,5 @@ async def create_party(
 		PartyManagerService, Depends(get_party_manager_service)
 	]
 ):
-	await party_manager_service.create_party(party_creation_message)
+	result = await party_manager_service.create_party(party_creation_message)
+	return {"redirect_url": f"http://localhost:8000/sream/{result}"}

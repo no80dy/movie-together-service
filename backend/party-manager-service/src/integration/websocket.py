@@ -9,11 +9,14 @@ class WebSocketRouter:
     def __init__(self):
         self.connections: dict[uuid.UUID, list[WebSocket]] = defaultdict(list)
 
-    def get_websocket_by_user_id(self, _id: uuid.UUID) -> list[WebSocket]:
+    def get_websocket_by_party_id(self, _id: uuid.UUID) -> list[WebSocket]:
         return self.connections[_id]
 
-    def add_pair_in_table(self, _id: uuid.UUID, websocket: WebSocket):
+    def add_connection(self, _id: uuid.UUID, websocket: WebSocket):
         self.connections[_id].append(websocket)
+
+    def remove_connection(self, _id: uuid.UUID, websocket: WebSocket) -> None:
+        self.connections[_id].remove(websocket)
 
 
 @lru_cache(maxsize=1)

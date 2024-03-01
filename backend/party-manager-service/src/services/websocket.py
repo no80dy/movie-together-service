@@ -4,10 +4,10 @@ import datetime
 
 from typing import Annotated
 from functools import lru_cache
-from fastapi import Depends, WebSocket
+from fastapi import Depends, WebSocket, WebSocketDisconnect
 
 from integration.websocket import get_websocket_router, WebSocketRouter
-from integration.storages import IStorage
+from integration.storages import IStorage, get_storage
 
 
 class WebSocketConnectionService:
@@ -19,30 +19,30 @@ class WebSocketConnectionService:
         self.websocket_router = websocket_router
         self.storage = storage
 
-    async def connect(self, user_id: uuid.UUID, websocket: WebSocket):
+    async def connect(
+        self, username: str, party_id: uuid.UUID, websocket: WebSocket
+    ):
         await websocket.accept()
-        # self.storage.find_element_by_properties({""})
-        self.websocket_router.add_pair_in_table(user_id, websocket)
-        while True:
-            result = await self.storage.find_element_by_properties(
-                    {"users_ids": {"$in": [user_id]}},
-                    "parties"
-            )
-            played_time = \
-                datetime.datetime.utcnow() - datetime.datetime.strptime(
-                    result["player_time"], "%Y-%m-%dT%H:%M:%S"
-                )
-            await websocket.send_json(
-                {"type": "sync", "played_time": played_time}
-            )
-            message = await websocket.receive_json()
-            # Here will be chatting with users
-            # Here will be sending a server video playing time
-            await asyncio.sleep(1)
+        self.websocket_router.add_connection(party_id, websocket)
+        await websocket.send_text(f"{username} joined to the party!")
+        try:
+            while True:
+                websocket_connections = \
+                    self.websocket_router.get_websocket_by_party_id(party_id)
+                message = await websocket.receive_text()
+                for websocket_connection in websocket_connections:
+                    await websocket_connection.send_text(
+                        f"{username} says {message}"
+                    )
+                await asyncio.sleep(1)
+        except WebSocketDisconnect:
+            self.websocket_router.remove_connection(party_id, websocket)
+            await websocket.send_text(f"{username} left the party!")
 
 
 @lru_cache
-def get_websocket_receiver(
-    websocket_router: Annotated[WebSocketRouter, Depends(get_websocket_router)]
+def get_websocket_connection_service(
+    websocket_router: Annotated[WebSocketRouter, Depends(get_websocket_router)],
+    storage: Annotated[IStorage, Depends(get_storage)]
 ) -> WebSocketConnectionService:
-    return WebSocketConnectionService(websocket_router)
+    return WebSocketConnectionService(websocket_router, storage)

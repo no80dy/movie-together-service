@@ -1,3 +1,4 @@
+import uuid
 import time
 import jwt
 
@@ -6,6 +7,7 @@ from fastapi import (
     APIRouter, WebSocket, WebSocketException, Query, status, Depends
 )
 from core.config import settings
+from services.websocket import WebSocketConnectionService, get_websocket_connection_service
 
 
 router = APIRouter()
@@ -25,3 +27,17 @@ async def decode_token(token: Annotated[str, Query()]) -> dict:
         raise WebSocketException(
             code=status.WS_1009_INVALID_TOKEN, reason="Invalid token"
         )
+
+
+@router.websocket("/ws/{party_id}")
+async def part_connection(
+    party_id: uuid.UUID,
+    user_data: Annotated[dict, Depends(decode_token)],
+    websocket: WebSocket,
+    websocket_connection_service: Annotated[
+        WebSocketConnectionService, Depends(get_websocket_connection_service)
+    ]
+):
+    await websocket_connection_service.connect(
+        user_data["username"], party_id, websocket
+    )
