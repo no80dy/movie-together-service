@@ -9,7 +9,7 @@
 <body>
     <video id="video"></video>
     <h1>WebSocket Chat</h1>
-    <form action="" onsubmit="sendMessage(event)">
+    <form action="" onsubmit="sendWebSocketChatMessage(event)">
         <input type="text" id="messageText" autocomplete="off"/>
         <button>Send</button>
     </form>
@@ -21,18 +21,20 @@
     <script>
         let ws = new WebSocket("{{ websocket_link }}");
         let player = undefined;
-        let programmicSet = false;
+
         document.addEventListener("DOMContentLoaded", () => {
             const video = document.getElementById("video");
             const source_host = "{{ stream_link }}";
-            console.log(source_host);
+
             if(Hls.isSupported()) {
                 const hls = new Hls();
                 const playerOptions = {};
+
                 hls.loadSource(source_host);
-                console.log(hls);
+
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                     const availableQualities = hls.levels.map((l) => l.height);
+
                     playerOptions.controls = [
                         "play-large", "restart", "rewind", "play", "fast-forward", "progress", "current-time", "duration",
                         "mute", "volume", "captions", "settings", "pip", "airplay", "fullscreen"
@@ -45,35 +47,9 @@
                     };
 
                     player = new Plyr(video, playerOptions);
-                    player.on("pause", (event) => {
-                        const instance = event.detail.plyr;
-                        const dataToSend = {
-                            type: "pause"
-                        }
-                        if (!programmicSet) {
-                            ws.send(JSON.stringify(dataToSend));
-                        }
-                        console.log("Video paused");
-                    });
-                    player.on("play", (event) => {
-                       const instance = event.detail.plyr;
-                       const dataToSend = {
-                           type: "play"
-                       };
-                       ws.send(JSON.stringify(dataToSend));
-                       console.log("Video resumed");
-                    });
-                    player.on("seeking", (event) => {
-                        const currentTime = event.detail.plyr.currentTime;
-                        const dataToSend = {
-                            type: "seeked",
-                            time: currentTime
-                        };
-                        if (!programmicSet) {
-                            ws.send(JSON.stringify(dataToSend));
-                            console.log("Video seeked");
-                        }
-                    });
+                    player.elements.progress.addEventListener("click", clickProgressHandler);
+                    // player.on("pause", sendPauseWebSocketMessage);
+                    // player.on("play", sendPlayWebSocketMessage);
                 });
                 hls.attachMedia(video);
                 window.hls = hls;
@@ -81,34 +57,77 @@
             else {
                 console.log("HLS is not supported");
             }
-            function updateQuality() {
-                window.hls.levels.forEach((level, levelIndex) => {
-                    window.hls.currentLevel = levelIndex;
-                });
-            }
         });
+
+        function sendWebSocketChatMessage(event) {
+            const input = document.getElementById("messsageText");
+            ws.send(
+                JSON.stringify({
+                    type: "chat",
+                    text: input.value
+                })
+            )
+            input.value = "";
+            event.preventDefault();
+        }
+
+        function updateQuality() {
+            window.hls.levels.forEach((level, levelText) => {
+                window.hls.currentLevel = levelText;
+            });
+        }
+
+        // function sendPlayWebSocketMessage(event) {
+        //     player.elements.addEventListener("click", (event) => {
+        //         ws.send(
+        //             JSON.stringify({
+        //                 type: "play"
+        //             })
+        //         );
+        //         console.log("play sent");
+        //     });
+        // }
+        //
+        // function sendPauseWebSocketMessage(event) {
+        //     player.elements.pause.addEventListener("click", (event) => {
+        //         ws.send(
+        //             JSON.stringify({
+        //                 type: "pause"
+        //             })
+        //         );
+        //         console.log("pause sent");
+        //     });
+        // }
+        const playerSeekedHandler = (event) => {
+                ws.send(
+                    JSON.stringify({
+                        type: "seeked",
+                        time: event.detail.plyr.currentTime
+                    })
+                );
+        };
+        const clickProgressHandler = (handle_event) => {
+            player.on("seeked", playerSeekedHandler);
+        };
 
         ws.onmessage = function(event) {
             const messages = document.getElementById('messages');
             const message = document.createElement('li');
-            const content = document.createTextNode(event.data);
             const consumedData = JSON.parse(event.data);
+
             switch (consumedData["type"]) {
                 case "pause":
                     player.pause();
-                    message.appendChild(document.createTextNode(consumedData["type"]));
-                    messages.appendChild(message);
+                    console.log("pause");
                     break;
                 case "play":
                     player.play();
-                    message.appendChild(document.createTextNode(consumedData["type"]));
-                    messages.appendChild(message);
+                    console.log("play");
                     break;
                 case "seeked":
-                    programmicSet = true;
-                    player.currentTime = parseInt(consumedData["time"]);
-                    message.appendChild(document.createTextNode(consumedData["type"]));
-                    messages.appendChild(message);
+                    player.off("seeked", playerSeekedHandler);
+                    player.currentTime = parseFloat(consumedData["time"]);
+                    console.log("seeked");
                     break;
                 case "chat":
                     message.appendChild(document.createTextNode(consumedData["text"]));
@@ -116,16 +135,6 @@
                     break;
             }
         };
-        function sendMessage(event) {
-            var input = document.getElementById("messageText");
-            const dataToSend = {
-                type: "chat",
-                text: input.value
-            };
-            ws.send(JSON.stringify(dataToSend));
-            input.value = '';
-            event.preventDefault();
-        }
     </script>
 </body>
 </html>
