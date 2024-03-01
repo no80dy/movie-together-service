@@ -21,6 +21,7 @@
     <script>
         let ws = new WebSocket("{{ websocket_link }}");
         let player = undefined;
+        let programmicSet = false;
         document.addEventListener("DOMContentLoaded", () => {
             const video = document.getElementById("video");
             const source_host = "{{ stream_link }}";
@@ -49,7 +50,9 @@
                         const dataToSend = {
                             type: "pause"
                         }
-                        ws.send(JSON.stringify(dataToSend));
+                        if (!programmicSet) {
+                            ws.send(JSON.stringify(dataToSend));
+                        }
                         console.log("Video paused");
                     });
                     player.on("play", (event) => {
@@ -60,14 +63,16 @@
                        ws.send(JSON.stringify(dataToSend));
                        console.log("Video resumed");
                     });
-                    player.on("seeked", (event) => {
-                       const currentTime = event.detail.plyr.currentTime;
-                       const dataToSend = {
-                           type: "seeked",
-                           time: currentTime
-                       };
-                       ws.send(JSON.stringify(dataToSend));
-                       console.log("Video seeked");
+                    player.on("seeking", (event) => {
+                        const currentTime = event.detail.plyr.currentTime;
+                        const dataToSend = {
+                            type: "seeked",
+                            time: currentTime
+                        };
+                        if (!programmicSet) {
+                            ws.send(JSON.stringify(dataToSend));
+                            console.log("Video seeked");
+                        }
                     });
                 });
                 hls.attachMedia(video);
@@ -91,14 +96,24 @@
             switch (consumedData["type"]) {
                 case "pause":
                     player.pause();
+                    message.appendChild(document.createTextNode(consumedData["type"]));
+                    messages.appendChild(message);
                     break;
                 case "play":
-                    break
+                    player.play();
+                    message.appendChild(document.createTextNode(consumedData["type"]));
+                    messages.appendChild(message);
+                    break;
                 case "seeked":
-                    break
+                    programmicSet = true;
+                    player.currentTime = parseInt(consumedData["time"]);
+                    message.appendChild(document.createTextNode(consumedData["type"]));
+                    messages.appendChild(message);
+                    break;
                 case "chat":
                     message.appendChild(document.createTextNode(consumedData["text"]));
                     messages.appendChild(message);
+                    break;
             }
         };
         function sendMessage(event) {
