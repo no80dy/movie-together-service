@@ -48,8 +48,8 @@
 
                     player = new Plyr(video, playerOptions);
                     player.elements.progress.addEventListener("click", clickProgressHandler);
-                    // player.on("pause", sendPauseWebSocketMessage);
-                    // player.on("play", sendPlayWebSocketMessage);
+                    player.elements.container.addEventListener("click", clickPlayHandler);
+                    player.elements.container.addEventListener("click", clickPauseHandler);
                 });
                 hls.attachMedia(video);
                 window.hls = hls;
@@ -77,37 +77,38 @@
             });
         }
 
-        // function sendPlayWebSocketMessage(event) {
-        //     player.elements.addEventListener("click", (event) => {
-        //         ws.send(
-        //             JSON.stringify({
-        //                 type: "play"
-        //             })
-        //         );
-        //         console.log("play sent");
-        //     });
-        // }
-        //
-        // function sendPauseWebSocketMessage(event) {
-        //     player.elements.pause.addEventListener("click", (event) => {
-        //         ws.send(
-        //             JSON.stringify({
-        //                 type: "pause"
-        //             })
-        //         );
-        //         console.log("pause sent");
-        //     });
-        // }
-        const playerSeekedHandler = (event) => {
-                ws.send(
-                    JSON.stringify({
-                        type: "seeked",
-                        time: event.detail.plyr.currentTime
-                    })
-                );
+        const playHandler = (event) => {
+            ws.send(
+                JSON.stringify({
+                    type: "play"
+                })
+            );
+        }
+
+        const pauseHandler = (event) => {
+            ws.send(
+                JSON.stringify({
+                    type: "pause"
+                })
+            );
         };
-        const clickProgressHandler = (handle_event) => {
+        const playerSeekedHandler = (event) => {
+            ws.send(
+                JSON.stringify({
+                    type: "seeked",
+                    time: event.detail.plyr.currentTime
+                })
+            );
+        };
+
+        const clickProgressHandler = (event) => {
             player.on("seeked", playerSeekedHandler);
+        };
+        const clickPauseHandler = (event) => {
+            player.on("pause", pauseHandler);
+        };
+        const clickPlayHandler = (event) => {
+            player.on("play", playHandler);
         };
 
         ws.onmessage = function(event) {
@@ -117,10 +118,12 @@
 
             switch (consumedData["type"]) {
                 case "pause":
+                    player.off("pause", pauseHandler);
                     player.pause();
                     console.log("pause");
                     break;
                 case "play":
+                    player.off("play", playHandler);
                     player.play();
                     console.log("play");
                     break;
