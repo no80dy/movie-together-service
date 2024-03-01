@@ -77,7 +77,7 @@
             });
         }
 
-        const playHandler = (event) => {
+        const playerPlayHandler = (event) => {
             ws.send(
                 JSON.stringify({
                     type: "play"
@@ -85,7 +85,7 @@
             );
         }
 
-        const pauseHandler = (event) => {
+        const playerPauseHandler = (event) => {
             ws.send(
                 JSON.stringify({
                     type: "pause"
@@ -105,10 +105,10 @@
             player.on("seeked", playerSeekedHandler);
         };
         const clickPauseHandler = (event) => {
-            player.on("pause", pauseHandler);
+            player.on("pause", playerPauseHandler);
         };
         const clickPlayHandler = (event) => {
-            player.on("play", playHandler);
+            player.on("play", playerPlayHandler);
         };
 
         ws.onmessage = function(event) {
@@ -118,12 +118,12 @@
 
             switch (consumedData["type"]) {
                 case "pause":
-                    player.off("pause", pauseHandler);
+                    player.off("pause", playerPauseHandler);
                     player.pause();
                     console.log("pause");
                     break;
                 case "play":
-                    player.off("play", playHandler);
+                    player.off("play", playerPauseHandler);
                     player.play();
                     console.log("play");
                     break;
