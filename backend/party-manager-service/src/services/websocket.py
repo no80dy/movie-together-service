@@ -67,15 +67,14 @@ class WebSocketConnectionService:
                         )
                 elif message_json["type"] == "seeked":
                     for websocket_connection in websocket_connections:
-                        if websocket != websocket_connection:
-                            await websocket_connection.send_text(
-                                json.dumps(
-                                    {
-                                        "type": "seeked",
-                                        "time": message_json["time"]
-                                    }
-                                )
+                        await websocket_connection.send_text(
+                            json.dumps(
+                                {
+                                    "type": "seeked",
+                                    "time": message_json["time"]
+                                }
                             )
+                        )
                 await asyncio.sleep(1)
         except WebSocketDisconnect:
             self.websocket_router.remove_connection(party_id, websocket)

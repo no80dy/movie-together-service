@@ -47,7 +47,9 @@
                     };
 
                     player = new Plyr(video, playerOptions);
-                    player.elements.progress.addEventListener("click", clickProgressHandler);
+                    player.elements.progress.onclick = function () {
+                        playerSeekedHandler();
+                    };
                     player.elements.container.addEventListener("click", clickPlayHandler);
                     player.elements.container.addEventListener("click", clickPauseHandler);
                 });
@@ -92,11 +94,11 @@
                 })
             );
         };
-        const playerSeekedHandler = (event) => {
+        const playerSeekedHandler = () => {
             ws.send(
                 JSON.stringify({
                     type: "seeked",
-                    time: event.detail.plyr.currentTime
+                    time: player.currentTime
                 })
             );
         };
@@ -123,7 +125,7 @@
                     console.log("pause");
                     break;
                 case "play":
-                    player.off("play", playerPauseHandler);
+                    player.off("play", playerPlayHandler);
                     player.play();
                     console.log("play");
                     break;
