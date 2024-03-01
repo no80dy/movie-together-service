@@ -19,6 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
+        let ws = new WebSocket("{{ websocket_link }}");
+        let player = undefined;
         document.addEventListener("DOMContentLoaded", () => {
             const video = document.getElementById("video");
             const source_host = "{{ stream_link }}";
@@ -40,10 +42,32 @@
                         forced: true,
                         onChange: (e) => updateQuality(e)
                     };
-                    const player = new Plyr(video, playerOptions);
+
+                    player = new Plyr(video, playerOptions);
                     player.on("pause", (event) => {
                         const instance = event.detail.plyr;
+                        const dataToSend = {
+                            type: "pause"
+                        }
+                        ws.send(JSON.stringify(dataToSend));
                         console.log("Video paused");
+                    });
+                    player.on("play", (event) => {
+                       const instance = event.detail.plyr;
+                       const dataToSend = {
+                           type: "play"
+                       };
+                       ws.send(JSON.stringify(dataToSend));
+                       console.log("Video resumed");
+                    });
+                    player.on("seeked", (event) => {
+                       const currentTime = event.detail.plyr.currentTime;
+                       const dataToSend = {
+                           type: "seeked",
+                           time: currentTime
+                       };
+                       ws.send(JSON.stringify(dataToSend));
+                       console.log("Video seeked");
                     });
                 });
                 hls.attachMedia(video);
@@ -58,42 +82,34 @@
                 });
             }
         });
-        // const player = new videojs('#my-video');
-        //
-        // player.on('pause', event => {
-        //     console.log('Video paused');
-        // });
-        //
-        // player.on('seeked', event => {
-        //     console.log('User seeked video');
-        // });
-        //
-        // player.on('play', event => {
-        //     console.log('Video played after pause');
-        // });
 
-        let ws = new WebSocket("{{ websocket_link }}");
         ws.onmessage = function(event) {
-            const messages = document.getElementById('messages')
-            const message = document.createElement('li')
-            const content = document.createTextNode(event.data)
-            // switch (event.data["type"]) {
-            //     case "pause":
-            //         break
-            //     case "play":
-            //         break
-            //     case "seeked":
-            //         break
-            //     case ""
-            // }
-            message.appendChild(content)
-            messages.appendChild(message)
+            const messages = document.getElementById('messages');
+            const message = document.createElement('li');
+            const content = document.createTextNode(event.data);
+            const consumedData = JSON.parse(event.data);
+            switch (consumedData["type"]) {
+                case "pause":
+                    player.pause();
+                    break;
+                case "play":
+                    break
+                case "seeked":
+                    break
+                case "chat":
+                    message.appendChild(document.createTextNode(consumedData["text"]));
+                    messages.appendChild(message);
+            }
         };
         function sendMessage(event) {
-            var input = document.getElementById("messageText")
-            ws.send(input.value)
-            input.value = ''
-            event.preventDefault()
+            var input = document.getElementById("messageText");
+            const dataToSend = {
+                type: "chat",
+                text: input.value
+            };
+            ws.send(JSON.stringify(dataToSend));
+            input.value = '';
+            event.preventDefault();
         }
     </script>
 </body>
