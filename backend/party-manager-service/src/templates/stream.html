@@ -19,7 +19,6 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        let ws = new WebSocket("{{ websocket_link }}");
 
         document.addEventListener("DOMContentLoaded", () => {
             const video = document.getElementById("video");
@@ -45,28 +44,8 @@
                         onChange: (e) => updateQuality(e)
                     };
 
-                    player = new Plyr(video, playerOptions);
-                    player.elements.progress.onclick = function () {
-                        playerSeekedHandler();
-                    };
-                    const clickPauseHandler = (event) => {
-                        player.on("pause", playerPauseHandler);
-                    };
-                    const clickPlayHandler = (event) => {
-                        player.on("play", playerPlayHandler);
-                    };
-                    player.elements.container.addEventListener("click", clickPlayHandler);
-                    player.elements.container.addEventListener("click", clickPauseHandler);
-
-                    setInterval(() => {
-                        ws.send(
-                            JSON.stringify({
-                                type: "timeupdate",
-                                time: player.currentTime
-                            })
-                        );
-                        console.log("timeupdate sent");
-                    }, 3000);
+                    const player = new Plyr(video, playerOptions);
+                    let ws = new WebSocket("{{ websocket_link }}");
                     ws.onmessage = function(event) {
                         const messages = document.getElementById('messages');
                         const message = document.createElement('li');
@@ -76,15 +55,16 @@
                             case "pause":
                                 player.off("pause", playerPauseHandler);
                                 player.pause();
+                                player.currentTime = parseFloat(consumedData["time"])
                                 console.log("pause");
                                 break;
                             case "play":
                                 player.off("play", playerPlayHandler);
                                 player.play();
+                                player.currentTime = parseFloat(consumedData["time"])
                                 console.log("play");
                                 break;
                             case "seeked":
-                                player.off("seeked", playerSeekedHandler);
                                 player.currentTime = parseFloat(consumedData["time"]);
                                 console.log("seeked");
                                 break;
@@ -97,6 +77,69 @@
                                 console.log("timeupdate");
                                 break;
                         }
+                    };
+                    player.elements.progress.onclick = function () {
+                        playerSeekedHandler();
+                    };
+                    const clickPauseHandler = (event) => {
+                        player.on("pause", playerPauseHandler);
+                        // player.pause();
+                    };
+                    const clickPlayHandler = (event) => {
+                        player.on("play", playerPlayHandler);
+                        // player.play();
+                    };
+                    player.elements.container.addEventListener("click", clickPlayHandler);
+                    player.elements.container.addEventListener("click", clickPauseHandler);
+
+                    setInterval(() => {
+                        ws.send(
+                            JSON.stringify({
+                                type: "timeupdate",
+                                time: player.currentTime
+                            })
+                        );
+                        console.log("timeupdate sent");
+                    }, 250);
+                    ws.onclose = function(event) {
+                      if (event.wasClean) {
+                        alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+                      } else {
+                        // e.g. server process killed or network down
+                        // event.code is usually 1006 in this case
+                        alert('[close] Connection died');
+                      }
+                    };
+                    function updateQuality() {
+                        window.hls.levels.forEach((level, levelText) => {
+                            window.hls.currentLevel = levelText;
+                        });
+                    }
+
+                    const playerPlayHandler = (event) => {
+                        ws.send(
+                            JSON.stringify({
+                                type: "play",
+                                time: player.currentTime
+                            })
+                        );
+                    }
+
+                    const playerPauseHandler = (event) => {
+                        ws.send(
+                            JSON.stringify({
+                                type: "pause",
+                                time: player.currentTime
+                            })
+                        );
+                    };
+                    const playerSeekedHandler = () => {
+                        ws.send(
+                            JSON.stringify({
+                                type: "seeked",
+                                time: player.currentTime
+                            })
+                        );
                     };
                 });
                 hls.attachMedia(video);
@@ -118,36 +161,6 @@
             input.value = "";
             event.preventDefault();
         }
-
-        function updateQuality() {
-            window.hls.levels.forEach((level, levelText) => {
-                window.hls.currentLevel = levelText;
-            });
-        }
-
-        const playerPlayHandler = (event) => {
-            ws.send(
-                JSON.stringify({
-                    type: "play"
-                })
-            );
-        }
-
-        const playerPauseHandler = (event) => {
-            ws.send(
-                JSON.stringify({
-                    type: "pause"
-                })
-            );
-        };
-        const playerSeekedHandler = () => {
-            ws.send(
-                JSON.stringify({
-                    type: "seeked",
-                    time: player.currentTime
-                })
-            );
-        };
     </script>
 </body>
 </html>

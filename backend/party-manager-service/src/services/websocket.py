@@ -34,25 +34,26 @@ class WebSocketConnectionService:
         #     party_id,
         #     f"{username} joined to the party!"
         # )
-        if await self.cache.get(party_id):
-            await websocket.send_json(
-                json.loads((await self.cache.get(party_id)).decode('utf-8'))
-            )
-        await asyncio.create_task(self.send_time_update(username, party_id, websocket))
+        # if await self.cache.get(party_id):
+        data = {
+            "type": "timeupdate",
+            "time": json.loads((await self.cache.get(party_id)).decode('utf-8'))["time"]
+        }
+        await websocket.send_text(json.dumps(data))
 
-    async def send_time_update(self, username: str, party_id: uuid.UUID, websocket: WebSocket) -> None:
         try:
             while True:
                 message = await websocket.receive_json()
                 await self.handle_message(username, party_id, message)
-                await self.cache.set(party_id, message)
-                await asyncio.sleep(1)
+                await self.cache.set(party_id, {"time": message["time"]})
         except WebSocketDisconnect:
             # await self.notify_all(
             #     party_id,
             #     f"{username} left the party!"
             # )
             self.websocket_router.remove_connection(party_id, websocket)
+        finally:
+            await websocket.close()
 
     async def notify_all(self, party_id: uuid.UUID, text: str) -> None:
         websocket_connections = \
@@ -81,7 +82,7 @@ class WebSocketConnectionService:
         if message_type in ["pause", "play"]:
             await self.send_to_all(
                 websocket_connections,
-                {"type": message_type}
+                {"type": message_type, "time": message["time"]}
             )
         elif message_type == "seeked":
             await self.send_to_all(
