@@ -1,14 +1,14 @@
 import uvicorn
+import redis.asyncio as aioredis
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from core.config import settings
 from motor.motor_asyncio import AsyncIOMotorClient
-from integration import mongodb, rabbitmq
+from integration import mongodb, rabbitmq, redis
 from faststream.rabbit import RabbitBroker
 from api.v1 import film, stream, websockets
 from fastapi.middleware.cors import CORSMiddleware
-
 
 
 @asynccontextmanager
@@ -20,10 +20,12 @@ async def lifespan(app: FastAPI):
         login=settings.rabbitmq_login,
         password=settings.rabbitmq_password
     )
+    redis.redis_client = aioredis.Redis(host="localhost", port=6379)
     await rabbitmq.rabbitmq_broker.connect()
     await rabbitmq.configure_rabbit_queues()
     await rabbitmq.configure_rabbit_exchange()
     yield
+    await redis.redis_client.close()
     await rabbitmq.rabbitmq_broker.close()
     mongodb.mongo_client.close()
 

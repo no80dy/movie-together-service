@@ -20,7 +20,6 @@
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
         let ws = new WebSocket("{{ websocket_link }}");
-        let player = undefined;
 
         document.addEventListener("DOMContentLoaded", () => {
             const video = document.getElementById("video");
@@ -50,8 +49,55 @@
                     player.elements.progress.onclick = function () {
                         playerSeekedHandler();
                     };
+                    const clickPauseHandler = (event) => {
+                        player.on("pause", playerPauseHandler);
+                    };
+                    const clickPlayHandler = (event) => {
+                        player.on("play", playerPlayHandler);
+                    };
                     player.elements.container.addEventListener("click", clickPlayHandler);
                     player.elements.container.addEventListener("click", clickPauseHandler);
+
+                    setInterval(() => {
+                        ws.send(
+                            JSON.stringify({
+                                type: "timeupdate",
+                                time: player.currentTime
+                            })
+                        );
+                        console.log("timeupdate sent");
+                    }, 3000);
+                    ws.onmessage = function(event) {
+                        const messages = document.getElementById('messages');
+                        const message = document.createElement('li');
+                        const consumedData = JSON.parse(event.data);
+
+                        switch (consumedData["type"]) {
+                            case "pause":
+                                player.off("pause", playerPauseHandler);
+                                player.pause();
+                                console.log("pause");
+                                break;
+                            case "play":
+                                player.off("play", playerPlayHandler);
+                                player.play();
+                                console.log("play");
+                                break;
+                            case "seeked":
+                                player.off("seeked", playerSeekedHandler);
+                                player.currentTime = parseFloat(consumedData["time"]);
+                                console.log("seeked");
+                                break;
+                            case "chat":
+                                message.appendChild(document.createTextNode(consumedData["text"]));
+                                messages.appendChild(message);
+                                break;
+                            case "timeupdate":
+                                player.currentTime = parseFloat(consumedData["time"]);
+                                console.log("timeupdate");
+                                break;
+                        }
+                    };
                 });
                 hls.attachMedia(video);
                 window.hls = hls;
@@ -101,44 +147,6 @@
                     time: player.currentTime
                 })
             );
-        };
-
-        const clickProgressHandler = (event) => {
-            player.on("seeked", playerSeekedHandler);
-        };
-        const clickPauseHandler = (event) => {
-            player.on("pause", playerPauseHandler);
-        };
-        const clickPlayHandler = (event) => {
-            player.on("play", playerPlayHandler);
-        };
-
-        ws.onmessage = function(event) {
-            const messages = document.getElementById('messages');
-            const message = document.createElement('li');
-            const consumedData = JSON.parse(event.data);
-
-            switch (consumedData["type"]) {
-                case "pause":
-                    player.off("pause", playerPauseHandler);
-                    player.pause();
-                    console.log("pause");
-                    break;
-                case "play":
-                    player.off("play", playerPlayHandler);
-                    player.play();
-                    console.log("play");
-                    break;
-                case "seeked":
-                    player.off("seeked", playerSeekedHandler);
-                    player.currentTime = parseFloat(consumedData["time"]);
-                    console.log("seeked");
-                    break;
-                case "chat":
-                    message.appendChild(document.createTextNode(consumedData["text"]));
-                    messages.appendChild(message);
-                    break;
-            }
         };
     </script>
 </body>
