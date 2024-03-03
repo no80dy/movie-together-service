@@ -80,6 +80,7 @@ class UserResponseUsername(BaseModel):
 
 class RefreshToDb(BaseModel):
     """Модель записи сессии в postgres."""
+
     user_id: UUID
     refresh_jti: str
     user_agent: str = Field(max_length=255)
@@ -89,18 +90,21 @@ class RefreshToDb(BaseModel):
 
 class RefreshDelDb(BaseModel):
     """Модель удаления сессии из postgres."""
+
     user_id: UUID
     user_agent: str = Field(max_length=255)
 
 
 class UserLoginHistoryInDb(BaseModel):
     """Модель записи истории входа в аккаунт."""
+
     user_id: UUID
     user_agent: str = Field(max_length=255)
 
 
 class UserLogoutHistoryInDb(BaseModel):
     """Модель записи истории выхода из аккаунта."""
+
     user_id: UUID
     user_agent: str = Field(max_length=255)
     logout_at: datetime
@@ -118,6 +122,7 @@ class UserPaginatedHistoryInDb(BaseModel):
 
 class UserSocialNetworkInDb(BaseModel):
     """Модель записи информации об аккаунте в социальной сети."""
+
     user_id: UUID
     social_id: str
     social_name: str

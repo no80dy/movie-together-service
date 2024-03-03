@@ -23,7 +23,9 @@ class JWTBearer(HTTPBearer):
         super().__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request) -> str:
-        credentials: HTTPAuthorizationCredentials = await super().__call__(request)
+        credentials: HTTPAuthorizationCredentials = await super().__call__(
+            request
+        )
         if not credentials:
             raise HTTPException(
                 status_code=http.HTTPStatus.FORBIDDEN,

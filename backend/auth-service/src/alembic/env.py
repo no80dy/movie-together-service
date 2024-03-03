@@ -3,18 +3,15 @@ import os
 import sys
 from logging.config import fileConfig
 
-from sqlalchemy import pool
-from sqlalchemy.engine import Connection
-from sqlalchemy import MetaData
-from sqlalchemy.ext.asyncio import async_engine_from_config
-
 from alembic import context
+from sqlalchemy import MetaData, pool
+from sqlalchemy.engine import Connection
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from db.postgres import Base
+from db.postgres import Base, dsn
 from models.entity import *
-from db.postgres import dsn
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -39,6 +36,8 @@ print(target_metadata)
 # ... etc.
 
 url = dsn
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -75,7 +74,7 @@ async def run_async_migrations() -> None:
     """
 
     configuration = config.get_section(config.config_ini_section)
-    configuration['sqlalchemy.url'] = url
+    configuration["sqlalchemy.url"] = url
     connectable = async_engine_from_config(
         configuration,
         # config.get_section(config.config_ini_section, {}),

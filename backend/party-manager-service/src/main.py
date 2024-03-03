@@ -1,14 +1,14 @@
-import uvicorn
-import redis.asyncio as aioredis
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
 
-from core.config import settings
-from motor.motor_asyncio import AsyncIOMotorClient
-from integration import mongodb, rabbitmq, redis
-from faststream.rabbit import RabbitBroker
+import redis.asyncio as aioredis
+import uvicorn
 from api.v1 import film, stream, websockets
+from core.config import settings
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from faststream.rabbit import RabbitBroker
+from integration import mongodb, rabbitmq, redis
+from motor.motor_asyncio import AsyncIOMotorClient
 
 
 @asynccontextmanager
@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
         host=settings.rabbitmq_host,
         port=settings.rabbitmq_port,
         login=settings.rabbitmq_login,
-        password=settings.rabbitmq_password
+        password=settings.rabbitmq_password,
     )
     redis.redis_client = aioredis.Redis(host="localhost", port=6379)
     await rabbitmq.rabbitmq_broker.connect()
@@ -36,7 +36,7 @@ app = FastAPI(
     title=settings.project_name,
     docs_url="/party-manager-service/api/openapi",
     openapi_url="/party-manager-service/api/openapi.json",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -44,7 +44,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 

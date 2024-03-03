@@ -1,19 +1,23 @@
-import uuid
 import time
-import jwt
-
+import uuid
 from typing import Annotated
-from fastapi import (
-    APIRouter, WebSocket, WebSocketException, Query, status, Depends
-)
-from core.config import settings
-from services.websocket import (
-    WebSocketStreamConnectionService,
-    WebSocketChatConnectionService,
-    get_websocket_stream_connection_service,
-    get_websocket_chat_connection_service
-)
 
+import jwt
+from core.config import settings
+from fastapi import (
+    APIRouter,
+    Depends,
+    Query,
+    WebSocket,
+    WebSocketException,
+    status,
+)
+from services.websocket import (
+    WebSocketChatConnectionService,
+    WebSocketStreamConnectionService,
+    get_websocket_chat_connection_service,
+    get_websocket_stream_connection_service,
+)
 
 router = APIRouter()
 
@@ -26,7 +30,8 @@ async def decode_token(token: Annotated[str, Query()]) -> dict:
         return decoded_token if decoded_token["exp"] >= time.time() else None
     except jwt.ExpiredSignatureError:
         raise WebSocketException(
-            code=status.WS_1007_INVALID_FRAME_PAYLOAD_DATA, reason="Incorrect signature"
+            code=status.WS_1007_INVALID_FRAME_PAYLOAD_DATA,
+            reason="Incorrect signature",
         )
     except jwt.InvalidTokenError:
         raise WebSocketException(
@@ -40,8 +45,8 @@ async def stream_party_connection(
     websocket: WebSocket,
     websocket_stream_connection_service: Annotated[
         WebSocketStreamConnectionService,
-        Depends(get_websocket_stream_connection_service)
-    ]
+        Depends(get_websocket_stream_connection_service),
+    ],
 ):
     await websocket_stream_connection_service.connect(party_id, websocket)
 
@@ -52,7 +57,7 @@ async def chat_party_stream_connection(
     websocket: WebSocket,
     websocket_chat_connection_service: Annotated[
         WebSocketStreamConnectionService,
-        Depends(get_websocket_chat_connection_service)
-    ]
+        Depends(get_websocket_chat_connection_service),
+    ],
 ):
     await websocket_chat_connection_service.connect(party_id, websocket)

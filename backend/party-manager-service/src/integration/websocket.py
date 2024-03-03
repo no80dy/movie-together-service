@@ -1,8 +1,8 @@
 import uuid
+from collections import defaultdict
+from functools import lru_cache
 
 from fastapi import WebSocket
-from functools import lru_cache
-from collections import defaultdict
 
 
 class WebSocketRouter:

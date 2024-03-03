@@ -1,4 +1,9 @@
-from faststream.rabbit import ExchangeType, RabbitBroker, RabbitExchange, RabbitQueue
+from faststream.rabbit import (
+    ExchangeType,
+    RabbitBroker,
+    RabbitExchange,
+    RabbitQueue,
+)
 
 rabbitmq_broker: RabbitBroker | None = None
 
