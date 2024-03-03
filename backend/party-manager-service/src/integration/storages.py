@@ -23,7 +23,15 @@ class IStorage(ABC):
         pass
 
     @abstractmethod
-    async def insert_element(self, element: dict, collection_name: str) -> None:
+    async def insert_element(
+        self, element: dict, collection_name: str
+    ) -> None:
+        pass
+
+    @abstractmethod
+    async def update_element(
+        self, find_property: dict, update_property: dict, collection_name: str
+    ) -> None:
         pass
 
 
@@ -45,11 +53,22 @@ class MongoStorage(IStorage):
             .to_list(length=None)
         )
 
-    async def insert_element(self, element: dict, collection_name: str) -> None:
+    async def insert_element(
+        self, element: dict, collection_name: str
+    ) -> None:
         await self.database_client[collection_name].insert_one(element)
 
-    async def insert_elements(self, elements: list[dict], collection_name: str) -> None:
+    async def insert_elements(
+        self, elements: list[dict], collection_name: str
+    ) -> None:
         await self.database_client[collection_name].insert_many(elements)
+
+    async def update_element(
+        self, find_property: dict, update_property: dict, collection_name: str
+    ) -> None:
+        await self.database_client[collection_name].update_one(
+            find_property, update_property
+        )
 
 
 @lru_cache

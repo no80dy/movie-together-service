@@ -18,7 +18,8 @@ class PartyManagerService:
 			{
 				"party_id": str(party_id),
 				"film_id": str(party_creation_message.film_id),
-				"users_ids": [str(user_id) for user_id in party_creation_message.users_ids]
+				"users_ids": [str(user_id) for user_id in party_creation_message.users_ids],
+				"messages": []
 			},
 			"parties"
 		)
