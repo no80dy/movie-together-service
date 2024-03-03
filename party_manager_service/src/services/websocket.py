@@ -64,7 +64,9 @@ class WebSocketChatConnectionService:
         self.storage = storage
         self.websocket_router = websocket_router
 
-    async def connect(self, party_id: uuid.UUID, websocket: WebSocket) -> None:
+    async def connect(
+        self, username: str, party_id: uuid.UUID, websocket: WebSocket
+    ) -> None:
         await websocket.accept()
         self.websocket_router.add_connection(party_id, websocket)
 
@@ -75,7 +77,7 @@ class WebSocketChatConnectionService:
             await websocket.send_json(message)
         await asyncio.gather(
             self.send_all(
-                {"type": "chat", "text": "joined to the party!"},
+                {"type": "chat", "text": f"{username} joined to the party!"},
                 self.websocket_router.get_websocket_by_party_id(party_id),
             ),
             self.storage.update_element(
@@ -84,7 +86,7 @@ class WebSocketChatConnectionService:
                     "$push": {
                         "messages": {
                             "type": "chat",
-                            "text": "joined to the party!",
+                            "text": f"{username} joined to the party!",
                         }
                     }
                 },
@@ -95,6 +97,7 @@ class WebSocketChatConnectionService:
         try:
             while True:
                 message = await websocket.receive_json()
+                message["text"] = f"{username}: {message['text']}"
                 await asyncio.gather(
                     self.send_all(
                         message,
@@ -112,7 +115,7 @@ class WebSocketChatConnectionService:
             self.websocket_router.remove_connection(party_id, websocket)
             await asyncio.gather(
                 self.send_all(
-                    {"type": "chat", "text": "left the party!"},
+                    {"type": "chat", "text": f"{username} left the party!"},
                     self.websocket_router.get_websocket_by_party_id(party_id),
                 ),
                 self.storage.update_element(
@@ -121,7 +124,7 @@ class WebSocketChatConnectionService:
                         "$push": {
                             "messages": {
                                 "type": "chat",
-                                "text": "left the party!",
+                                "text": f"{username} left the party!",
                             }
                         }
                     },

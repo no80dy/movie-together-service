@@ -55,9 +55,12 @@ async def stream_party_connection(
 async def chat_party_stream_connection(
     party_id: uuid.UUID,
     websocket: WebSocket,
+    token: Annotated[dict, Depends(decode_token)],
     websocket_chat_connection_service: Annotated[
-        WebSocketStreamConnectionService,
+        WebSocketChatConnectionService,
         Depends(get_websocket_chat_connection_service),
     ],
 ):
-    await websocket_chat_connection_service.connect(party_id, websocket)
+    await websocket_chat_connection_service.connect(
+        token["username"], party_id, websocket
+    )
