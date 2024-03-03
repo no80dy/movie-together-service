@@ -75,62 +75,39 @@ class WebSocketChatConnectionService:
         )
         for message in party["messages"]:
             await websocket.send_json(message)
-        await asyncio.gather(
-            self.send_all(
-                {"type": "chat", "text": f"{username} joined to the party!"},
-                self.websocket_router.get_websocket_by_party_id(party_id),
-            ),
-            self.storage.update_element(
-                {"party_id": str(party_id)},
-                {
-                    "$push": {
-                        "messages": {
-                            "type": "chat",
-                            "text": f"{username} joined to the party!",
-                        }
-                    }
-                },
-                "parties",
-            ),
+
+        await self.send_message_to_users_and_write_in_database(
+            {"type": "chat", "text": f"{username} joined the party!"}, party_id
         )
 
         try:
             while True:
                 message = await websocket.receive_json()
                 message["text"] = f"{username}: {message['text']}"
-                await asyncio.gather(
-                    self.send_all(
-                        message,
-                        self.websocket_router.get_websocket_by_party_id(
-                            party_id
-                        ),
-                    ),
-                    self.storage.update_element(
-                        {"party_id": str(party_id)},
-                        {"$push": {"messages": message}},
-                        "parties",
-                    ),
+                await self.send_message_to_users_and_write_in_database(
+                    message, party_id
                 )
         except WebSocketDisconnect:
             self.websocket_router.remove_connection(party_id, websocket)
-            await asyncio.gather(
-                self.send_all(
-                    {"type": "chat", "text": f"{username} left the party!"},
-                    self.websocket_router.get_websocket_by_party_id(party_id),
-                ),
-                self.storage.update_element(
-                    {"party_id": str(party_id)},
-                    {
-                        "$push": {
-                            "messages": {
-                                "type": "chat",
-                                "text": f"{username} left the party!",
-                            }
-                        }
-                    },
-                    "parties",
-                ),
+            await self.send_message_to_users_and_write_in_database(
+                {"type": "chat", "text": f"{username} left the party!"},
+                party_id,
             )
+
+    async def send_message_to_users_and_write_in_database(
+        self, message: dict, party_id: uuid.UUID
+    ) -> None:
+        await asyncio.gather(
+            self.send_all(
+                message,
+                self.websocket_router.get_websocket_by_party_id(party_id),
+            ),
+            self.storage.update_element(
+                {"party_id": str(party_id)},
+                {"$push": {"messages": message}},
+                "parties",
+            ),
+        )
 
     @staticmethod
     async def send_all(
