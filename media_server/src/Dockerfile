@@ -12,7 +12,7 @@ RUN apk update &&\
     pip install --no-cache-dir --upgrade pip &&\
     pip install --no-cache-dir -r requirements.txt
 
-COPY ../.. .
+COPY . .
 
 RUN chmod +x ./entrypoint-fastapi.sh
 

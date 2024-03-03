@@ -1,11 +1,9 @@
-import uvicorn
 import structlog
-
+import uvicorn
 from api.v1 import stream
+from core.config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from core.config import settings
-
 
 structlog.configure(
     processors=[
@@ -13,7 +11,7 @@ structlog.configure(
         structlog.stdlib.filter_by_level,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
-        structlog.processors.TimeStamper(fmt='iso'),
+        structlog.processors.TimeStamper(fmt="iso"),
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
     ],
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -38,7 +36,9 @@ app.add_middleware(
 )
 
 
-app.include_router(stream.router, prefix="/api/v1/hls", tags=["HTTP Live Streaming"])
+app.include_router(
+    stream.router, prefix="/api/v1/hls", tags=["HTTP Live Streaming"]
+)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

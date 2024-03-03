@@ -33,15 +33,24 @@ services:
 
   party-manager-service:
     build:
-      context: ./party-manager-service/src
+      context: party_manager_service/src
       dockerfile: Dockerfile
     depends_on:
       - mongodb
       - minio
     env_file:
-      - ./party-manager-service/src/.env.fastapi
+      - party_manager_service/src/.env.fastapi
     ports:
       - "8002:8000"
+
+  media-service:
+    build:
+      context: ./media_server/src
+      dockerfile: Dockerfile
+    env_file:
+      - ./media_server/src/.env.fastapi
+    ports:
+      - "8003:8000"
 
   nginx:
     image: nginx:1.19.2
