@@ -1,8 +1,5 @@
-import uuid
-
 from typing import Annotated
 from fastapi import APIRouter, Depends
-from fastapi.responses import HTMLResponse, RedirectResponse
 
 from schemas.broker import PartyCreationMessage
 from services.broker import PartyManagerService, get_party_manager_service

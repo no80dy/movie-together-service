@@ -7,7 +7,12 @@ from fastapi import (
     APIRouter, WebSocket, WebSocketException, Query, status, Depends
 )
 from core.config import settings
-from services.websocket import WebSocketConnectionService, get_websocket_connection_service
+from services.websocket import (
+    WebSocketStreamConnectionService,
+    WebSocketChatConnectionService,
+    get_websocket_stream_connection_service,
+    get_websocket_chat_connection_service
+)
 
 
 router = APIRouter()
@@ -29,15 +34,25 @@ async def decode_token(token: Annotated[str, Query()]) -> dict:
         )
 
 
-@router.websocket("/ws/{party_id}")
-async def part_connection(
+@router.websocket("/ws/stream/{party_id}")
+async def stream_party_connection(
     party_id: uuid.UUID,
-    user_data: Annotated[dict, Depends(decode_token)],
     websocket: WebSocket,
-    websocket_connection_service: Annotated[
-        WebSocketConnectionService, Depends(get_websocket_connection_service)
+    websocket_stream_connection_service: Annotated[
+        WebSocketStreamConnectionService,
+        Depends(get_websocket_stream_connection_service)
     ]
 ):
-    await websocket_connection_service.connect(
-        user_data["username"], party_id, websocket
-    )
+    await websocket_stream_connection_service.connect(party_id, websocket)
+
+
+@router.websocket("/ws/chat/{party_id}")
+async def chat_party_stream_connection(
+    party_id: uuid.UUID,
+    websocket: WebSocket,
+    websocket_chat_connection_service: Annotated[
+        WebSocketStreamConnectionService,
+        Depends(get_websocket_chat_connection_service)
+    ]
+):
+    await websocket_chat_connection_service.connect(party_id, websocket)

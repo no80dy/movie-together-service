@@ -20,5 +20,10 @@ class WebSocketRouter:
 
 
 @lru_cache(maxsize=1)
-def get_websocket_router() -> WebSocketRouter:
+def get_stream_websocket_router() -> WebSocketRouter:
+    return WebSocketRouter()
+
+
+@lru_cache(maxsize=1)
+def get_chat_websocket_router() -> WebSocketRouter:
     return WebSocketRouter()

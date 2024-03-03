@@ -1,13 +1,12 @@
-import uuid
-from jinja2 import Template
 import os
+import uuid
 from typing import Annotated
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import (
-    StreamingResponse, HTMLResponse, Response
+    StreamingResponse, Response
 )
 from api.v1.auth import security_jwt
 from services.broker import PartyManagerService, get_party_manager_service
@@ -37,8 +36,10 @@ async def stream_film(
             "request": request,
             "stream_link":
                 f'http://localhost:8000/api/v1/stream/hls/video/video.m3u8',
-            "websocket_link":
-                f"ws://localhost:8000/ws/{party_id}?token={token}"
+            "websocket_stream_link":
+                f"ws://localhost:8000/ws/stream/{party_id}?token={token}",
+            "websocket_chat_link":
+                f"ws://localhost:8000/ws/chat/{party_id}?token={token}"
         }
     )
 

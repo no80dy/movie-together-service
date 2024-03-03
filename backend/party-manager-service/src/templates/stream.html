@@ -9,17 +9,37 @@
 <body>
     <video id="video"></video>
     <h1>WebSocket Chat</h1>
-    <form action="" onsubmit="sendWebSocketChatMessage(event)">
-        <input type="text" id="messageText" autocomplete="off"/>
-        <button>Send</button>
-    </form>
-    <ul id='messages'>
-    </ul>
+        <form action="" onsubmit="sendWebSocketChatMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
+        let ws_chat = new WebSocket("{{ websocket_chat_link }}");
+        ws_chat.onmessage = function (event) {
+            const messages = document.getElementById('messages');
+            const message = document.createElement('li');
 
+            const consumedData = JSON.parse(event.data);
+            const content = document.createTextNode(consumedData["text"]);
+            message.appendChild(content);
+            messages.appendChild(message);
+        };
+        function sendWebSocketChatMessage(event) {
+            const input = document.getElementById("messageText");
+            ws_chat.send(
+                JSON.stringify({
+                    type: "chat",
+                    text: input.value
+                })
+            )
+            input.value = "";
+            event.preventDefault();
+        }
         document.addEventListener("DOMContentLoaded", () => {
             const video = document.getElementById("video");
             const source_host = "{{ stream_link }}";
@@ -45,10 +65,9 @@
                     };
 
                     const player = new Plyr(video, playerOptions);
-                    let ws = new WebSocket("{{ websocket_link }}");
-                    ws.onmessage = function(event) {
-                        const messages = document.getElementById('messages');
-                        const message = document.createElement('li');
+                    let ws_stream = new WebSocket("{{ websocket_stream_link }}");
+
+                    ws_stream.onmessage = function(event) {
                         const consumedData = JSON.parse(event.data);
 
                         switch (consumedData["type"]) {
@@ -68,10 +87,6 @@
                                 player.currentTime = parseFloat(consumedData["time"]);
                                 console.log("seeked");
                                 break;
-                            case "chat":
-                                message.appendChild(document.createTextNode(consumedData["text"]));
-                                messages.appendChild(message);
-                                break;
                             case "timeupdate":
                                 player.currentTime = parseFloat(consumedData["time"]);
                                 console.log("timeupdate");
@@ -83,17 +98,15 @@
                     };
                     const clickPauseHandler = (event) => {
                         player.on("pause", playerPauseHandler);
-                        // player.pause();
                     };
                     const clickPlayHandler = (event) => {
                         player.on("play", playerPlayHandler);
-                        // player.play();
                     };
                     player.elements.container.addEventListener("click", clickPlayHandler);
                     player.elements.container.addEventListener("click", clickPauseHandler);
 
                     setInterval(() => {
-                        ws.send(
+                        ws_stream.send(
                             JSON.stringify({
                                 type: "timeupdate",
                                 time: player.currentTime
@@ -101,12 +114,10 @@
                         );
                         console.log("timeupdate sent");
                     }, 250);
-                    ws.onclose = function(event) {
+                    ws_stream.onclose = function(event) {
                       if (event.wasClean) {
                         alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
                       } else {
-                        // e.g. server process killed or network down
-                        // event.code is usually 1006 in this case
                         alert('[close] Connection died');
                       }
                     };
@@ -117,7 +128,7 @@
                     }
 
                     const playerPlayHandler = (event) => {
-                        ws.send(
+                        ws_stream.send(
                             JSON.stringify({
                                 type: "play",
                                 time: player.currentTime
@@ -126,7 +137,7 @@
                     }
 
                     const playerPauseHandler = (event) => {
-                        ws.send(
+                        ws_stream.send(
                             JSON.stringify({
                                 type: "pause",
                                 time: player.currentTime
@@ -134,7 +145,7 @@
                         );
                     };
                     const playerSeekedHandler = () => {
-                        ws.send(
+                        ws_stream.send(
                             JSON.stringify({
                                 type: "seeked",
                                 time: player.currentTime
@@ -149,18 +160,6 @@
                 console.log("HLS is not supported");
             }
         });
-
-        function sendWebSocketChatMessage(event) {
-            const input = document.getElementById("messsageText");
-            ws.send(
-                JSON.stringify({
-                    type: "chat",
-                    text: input.value
-                })
-            )
-            input.value = "";
-            event.preventDefault();
-        }
     </script>
 </body>
 </html>
