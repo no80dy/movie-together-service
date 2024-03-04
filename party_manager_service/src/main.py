@@ -20,7 +20,9 @@ async def lifespan(app: FastAPI):
         login=settings.rabbitmq_login,
         password=settings.rabbitmq_password,
     )
-    redis.redis_client = aioredis.Redis(host="localhost", port=6379)
+    redis.redis_client = aioredis.Redis(
+        host=settings.redis_host, port=settings.redis_port
+    )
     await rabbitmq.rabbitmq_broker.connect()
     await rabbitmq.configure_rabbit_queues()
     await rabbitmq.configure_rabbit_exchange()
@@ -48,9 +50,17 @@ app.add_middleware(
 )
 
 
-app.include_router(film.router, prefix="/api/v1/broker", tags=["RabbitMQ"])
-app.include_router(stream.router, prefix="/api/v1/stream", tags=["HLS"])
-app.include_router(websockets.router, tags=["WebSockets"])
+app.include_router(
+    film.router, prefix="/party-manager-service/api/v1/broker",
+    tags=["RabbitMQ"]
+)
+app.include_router(
+    stream.router,
+    prefix="/party-manager-service/api/v1/stream", tags=["HLS"]
+)
+app.include_router(
+    websockets.router, prefix="/party-manager-service", tags=["WebSockets"]
+)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

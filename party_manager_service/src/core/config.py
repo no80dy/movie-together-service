@@ -11,10 +11,12 @@ class Settings(BaseSettings):
     mongodb_database_name: str = "partyDb"
     mongodb_notifications_collection_name: str = "parties"
 
-    rabbitmq_host: str
-    rabbitmq_port: int
-    rabbitmq_login: str
-    rabbitmq_password: str
+    rabbitmq_host: str = "rabbitmq"
+    rabbitmq_port: int = 5672
+    rabbitmq_login: str = "user"
+    rabbitmq_password: str = "rabbitmq"
+    redis_host: str = "localhost"
+    redis_port: int = 6379
 
     jwt_secret_key: str = "secret"
     jwt_algorithm: str = "HS256"
