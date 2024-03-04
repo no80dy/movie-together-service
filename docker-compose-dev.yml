@@ -1,0 +1,63 @@
+version: '3'
+include:
+  - ./deploy/postgresql/postgresql-dev.yml
+  - ./deploy/redis/redis-dev.yml
+  - ./deploy/rabbitmq/rabbitmq-dev.yml
+  - ./deploy/mongodb/mongodb-dev.yml
+  - ./deploy/minio/minio-dev.yml
+
+services:
+  auth-service:
+    build:
+      context: ./auth-service/src
+      dockerfile: Dockerfile
+    env_file:
+      - ./auth-service/fastapi.env
+    volumes:
+      - ./auth-service/src/alembic/versions:/app/alembic/versions
+    depends_on:
+      - postgresql
+      - redis
+    ports:
+      - "8000:8000"
+
+  queue-manager-service:
+    build:
+      context: ./queue-manager-service/src
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+      - rabbitmq
+    ports:
+      - "8001:8001"
+
+  party-manager-service:
+    build:
+      context: party_manager_service/src
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb
+      - minio
+    env_file:
+      - party_manager_service/src/.env.fastapi
+    ports:
+      - "8002:8000"
+
+  media-service:
+    build:
+      context: media_service/src
+      dockerfile: Dockerfile
+    env_file:
+      - media_service/src/.env.fastapi
+    ports:
+      - "8003:8000"
+
+  nginx:
+    image: nginx:1.19.2
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - auth-service
+    ports:
+      - "80:80"

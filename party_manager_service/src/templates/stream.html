@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+</head>
+<body>
+    <video id="video"></video>
+    <h1>WebSocket Chat</h1>
+    <form action="" onsubmit="sendWebSocketChatMessage(event)">
+        <input type="text" id="messageText" autocomplete="off"/>
+        <button>Send</button>
+    </form>
+    <ul id='messages'>
+    </ul>
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script>
+        let ws_chat = new WebSocket("ws://localhost:8002/party-manager-service/ws{{ websocket_chat_link }}");
+        ws_chat.onmessage = function (event) {
+            const messages = document.getElementById('messages');
+            const message = document.createElement('li');
+
+            const consumedData = JSON.parse(event.data);
+            const content = document.createTextNode(consumedData["text"]);
+            message.appendChild(content);
+            messages.appendChild(message);
+        };
+        function sendWebSocketChatMessage(event) {
+            const input = document.getElementById("messageText");
+            ws_chat.send(
+                JSON.stringify({
+                    type: "chat",
+                    text: input.value
+                })
+            )
+            input.value = "";
+            event.preventDefault();
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            const video = document.getElementById("video");
+            const source_host = "{{ stream_link }}";
+
+            if(Hls.isSupported()) {
+                const hls = new Hls();
+                const playerOptions = {};
+
+                hls.loadSource(source_host);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                    const availableQualities = hls.levels.map((l) => l.height);
+
+                    playerOptions.controls = [
+                        "play-large", "restart", "rewind", "play", "fast-forward", "progress", "current-time", "duration",
+                        "mute", "volume", "captions", "settings", "pip", "airplay", "fullscreen"
+                    ];
+                    playerOptions.quality = {
+                        default: availableQualities[0],
+                        options: availableQualities,
+                        forced: true,
+                        onChange: (e) => updateQuality(e)
+                    };
+
+                    const player = new Plyr(video, playerOptions);
+                    let ws_stream = new WebSocket("ws://localhost:8002/party-manager-service/ws{{ websocket_stream_link }}");
+
+                    ws_stream.onmessage = function(event) {
+                        const consumedData = JSON.parse(event.data);
+
+                        switch (consumedData["type"]) {
+                            case "pause":
+                                player.off("pause", playerPauseHandler);
+                                player.pause();
+                                player.currentTime = parseFloat(consumedData["time"])
+                                console.log("pause");
+                                break;
+                            case "play":
+                                player.off("play", playerPlayHandler);
+                                player.play();
+                                player.currentTime = parseFloat(consumedData["time"])
+                                console.log("play");
+                                break;
+                            case "seeked":
+                                player.currentTime = parseFloat(consumedData["time"]);
+                                console.log("seeked");
+                                break;
+                            case "timeupdate":
+                                player.currentTime = parseFloat(consumedData["time"]);
+                                console.log("timeupdate");
+                                break;
+                        }
+                    };
+                    player.elements.progress.onclick = function () {
+                        playerSeekedHandler();
+                    };
+                    const clickPauseHandler = (event) => {
+                        player.on("pause", playerPauseHandler);
+                    };
+                    const clickPlayHandler = (event) => {
+                        player.on("play", playerPlayHandler);
+                    };
+                    player.elements.container.addEventListener("click", clickPlayHandler);
+                    player.elements.container.addEventListener("click", clickPauseHandler);
+
+                    setInterval(() => {
+                        ws_stream.send(
+                            JSON.stringify({
+                                type: "timeupdate",
+                                time: player.currentTime
+                            })
+                        );
+                        console.log("timeupdate sent");
+                    }, 250);
+                    ws_stream.onclose = function(event) {
+                      if (event.wasClean) {
+                          alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+                      } else {
+                          alert('[close] Connection died');
+                      }
+                    };
+                    function updateQuality() {
+                        window.hls.levels.forEach((level, levelText) => {
+                            window.hls.currentLevel = levelText;
+                        });
+                    }
+
+                    const playerPlayHandler = (event) => {
+                        ws_stream.send(
+                            JSON.stringify({
+                                type: "play",
+                                time: player.currentTime
+                            })
+                        );
+                    }
+
+                    const playerPauseHandler = (event) => {
+                        ws_stream.send(
+                            JSON.stringify({
+                                type: "pause",
+                                time: player.currentTime
+                            })
+                        );
+                    };
+                    const playerSeekedHandler = () => {
+                        ws_stream.send(
+                            JSON.stringify({
+                                type: "seeked",
+                                time: player.currentTime
+                            })
+                        );
+                    };
+                });
+                hls.attachMedia(video);
+                window.hls = hls;
+            }
+            else {
+                console.log("HLS is not supported");
+            }
+        });
+    </script>
+</body>
+</html>
