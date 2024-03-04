@@ -1,0 +1,14 @@
+version: '3'
+services:
+  minio:
+    image: 'bitnami/minio:latest'
+    env_file:
+      - ./.env.minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/bitnami/minio/data
+
+volumes:
+  minio_data:
