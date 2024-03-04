@@ -39,7 +39,7 @@ app.add_middleware(
 app.include_router(
     stream.router,
     prefix="/media-service/api/v1/hls",
-    tags=["HTTP Live Streaming"]
+    tags=["HTTP Live Streaming"],
 )
 
 if __name__ == "__main__":

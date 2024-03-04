@@ -51,12 +51,12 @@ app.add_middleware(
 
 
 app.include_router(
-    film.router, prefix="/party-manager-service/api/v1/broker",
-    tags=["RabbitMQ"]
+    film.router,
+    prefix="/party-manager-service/api/v1/broker",
+    tags=["RabbitMQ"],
 )
 app.include_router(
-    stream.router,
-    prefix="/party-manager-service/api/v1/stream", tags=["HLS"]
+    stream.router, prefix="/party-manager-service/api/v1/stream", tags=["HLS"]
 )
 app.include_router(
     websockets.router, prefix="/party-manager-service", tags=["WebSockets"]
