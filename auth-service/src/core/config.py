@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
 
-    POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PASSWORD: str = '123qwe'
+    POSTGRES_HOST: str = 'database'
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "users"
     POSTGRES_USER: str = "postgres"

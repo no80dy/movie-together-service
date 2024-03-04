@@ -49,7 +49,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 app.include_router(
     film.router,
     prefix="/party-manager-service/api/v1/broker",

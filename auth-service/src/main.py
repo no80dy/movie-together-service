@@ -63,19 +63,6 @@ app = FastAPI(
 
 FastAPIInstrumentor.instrument_app(app)
 
-
-@app.middleware("http")
-async def before_request(request: Request, call_next):
-    response = await call_next(request)
-    request_id = request.headers.get("X-Request-Id")
-    if not request_id:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": "X-Request-Id is required"},
-        )
-    return response
-
-
 app.include_router(users.router, prefix="/auth/api/v1/users", tags=["users"])
 app.include_router(
     groups.router, prefix="/auth/api/v1/groups", tags=["groups"]
