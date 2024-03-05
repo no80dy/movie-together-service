@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="container">
+		<div class="row gy-5">
+			<form action="{{ url_for('film_together') }}" method="post">
+				<div class="form-group mb-3 col-md-8 offset-md-2">
+					<label for="input-film-id">film_id</label>
+					<input class="form-control mt-1" id="input-film-id" type="text" required name="film_id" placeholder="Film_id" autofocus value="ff285a7d-6d87-41a2-9573-09558c3efac6">
+				</div>
+
+				<div class="offset-md-2">
+					<input class="btn btn-primary" type="submit" value="Film Together">
+				</div>
+			</form>
+		<div>
+	</div>
+
+<!--<div class="conteiner-fluid mx-4">-->
+<!--	<div class="row">-->
+<!--		&lt;!&ndash; Film 1 &ndash;&gt;-->
+<!--		<div class=" t1 col-sm-6 col-md-6 col-lg-2 mb-10">-->
+<!--			<img src="{{ url_for('static', path='/img/t1.png') }}" class="img-fluid rounded" alt="t1">-->
+<!--			<button class="btn btn-primary mt-2" onclick="">Watch together</button>-->
+<!--		</div>-->
+<!--		<div class=" t1 col-sm-6 col-md-6 col-lg-4 mb-10">-->
+<!--			<div>A human soldier is sent from 2029 to 1984 to stop an almost indestructible cyborg killing machine, sent from the same year, which has been programmed to execute a young woman whose unborn son is the key to humanity's future salvation.-->
+<!--			</div>-->
+<!--		</div>-->
+<!--		&lt;!&ndash; Film 2 &ndash;&gt;-->
+<!--		<div class=" t2 col-sm-6 col-md-6 col-lg-2 mb-10">-->
+<!--			<img src="{{ url_for('static', path='/img/t2.png') }}" class="img-fluid rounded" alt="t1">-->
+<!--			<button class="btn btn-primary mt-2" onclick="">Watch together</button>-->
+<!--		</div>-->
+<!--		<div class=" t2 col-sm-6 col-md-6 col-lg-4 mb-10">-->
+<!--			<div>A cyborg, identical to the one who failed to kill Sarah Connor, must now protect her ten year old son John from an even more advanced and powerful cyborg.-->
+<!--			</div>-->
+<!--		</div>-->
+<!--	</div>-->
+<!--</div>-->
+
+
+{% endblock %}
+
