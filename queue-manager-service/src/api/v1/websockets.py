@@ -2,9 +2,8 @@ import uuid
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
-
-from services.websocket import WebSocketService, get_websocket_service
 from services.client_id import ClientIDService, get_client_id_service
+from services.websocket import WebSocketService, get_websocket_service
 
 router = APIRouter()
 
@@ -47,7 +46,7 @@ html = """
 """
 
 
-@router.websocket('/ws/{client_id}')
+@router.websocket("/ws/{client_id}")
 async def websocket_endpoint(
     websocket: WebSocket,
     client_id: str,
@@ -60,10 +59,14 @@ async def websocket_endpoint(
     try:
         while True:
             data = await websocket.receive_text()
-            await websocket_service.broadcast(film_id, f"Client #{client_id} says: {data}")
+            await websocket_service.broadcast(
+                film_id, f"Client #{client_id} says: {data}"
+            )
     except WebSocketDisconnect:
         websocket_service.disconnect(client_id)
-        await websocket_service.broadcast(film_id, f"Client #{client_id} left the chat")
+        await websocket_service.broadcast(
+            film_id, f"Client #{client_id} left the chat"
+        )
 
 
 @router.get("/")

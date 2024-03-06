@@ -1,14 +1,13 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from api.v1 import websockets, queues
+from api.v1 import queues, websockets
 from core.config import settings
 from fastapi import FastAPI
 from faststream.rabbit import RabbitBroker
-from redis.asyncio import Redis
-
 from integration import rabbitmq, redis
 from motor.motor_asyncio import AsyncIOMotorClient
+from redis.asyncio import Redis
 
 
 @asynccontextmanager
@@ -42,10 +41,10 @@ app = FastAPI(
 )
 
 app.include_router(
-    queues.router, prefix='/queues/api/v1', tags=['films_queues']
+    queues.router, prefix="/queues/api/v1", tags=["films_queues"]
 )
 app.include_router(
-    websockets.router, prefix="/waiting_party/api/v1", tags=['waiting_party']
+    websockets.router, prefix="/waiting_party/api/v1", tags=["waiting_party"]
 )
 
 
