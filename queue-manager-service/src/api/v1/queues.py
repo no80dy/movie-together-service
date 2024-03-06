@@ -21,7 +21,6 @@ router = APIRouter()
 async def manage_queue(
     film_id: uuid.UUID = Form(),
     # user_data: Annotated[dict, Depends(security_jwt)],
-    user_agent: Annotated[str | None, Header()] = None,
     queue_service: QueueService = Depends(get_queue_service),
 ) -> RedirectResponse:
     """
@@ -29,12 +28,6 @@ async def manage_queue(
     При наборе определенного количества пользователей для данной группы пользователей
     отправляется запрос на создание сеанса просмотра.
     """
-    if not user_agent:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="Вы пытаетесь зайти с неизвестного устройства",
-        )
-
     # for test
     user_data = {"user_id": "86830a5a-4b8c-4ea3-91f6-a2b6e03bdc50"}
 

@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from api.v1 import queues, websockets
 from core.config import settings
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from faststream.rabbit import RabbitBroker
 from integration import rabbitmq, redis
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -39,6 +39,31 @@ app = FastAPI(
     openapi_url="/queue/api/openapi.json",
     lifespan=lifespan,
 )
+
+
+@app.middleware("http")
+async def create_auth_header(
+        request: Request,
+        call_next, ):
+    '''
+    Check if there are cookies set for authorization. If so, construct the
+    Authorization header and modify the request (unless the header already
+    exists!)
+    '''
+    if ("Authorization" not in request.headers
+            and "access_token_cookie" in request.cookies
+    ):
+        access_token = request.cookies["access_token_cookie"]
+
+        request.headers.__dict__["_list"].append(
+            (
+                "authorization".encode(),
+                f"Bearer {access_token}".encode(),
+            )
+        )
+    response = await call_next(request)
+    return response
+
 
 app.include_router(
     queues.router, prefix="/queues/api/v1", tags=["films_queues"]
