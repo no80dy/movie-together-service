@@ -8,7 +8,7 @@
 		<!-- Film 1 -->
 		<div class=" t1 col-sm-6 col-md-6 col-lg-2 mb-10 mt-2">
 			<img src="{{ url_for('static', path='/img/t1.png') }}" class="img-fluid rounded" alt="t1">
-			<button class="btn btn-primary mt-2" onclick="createParty(event)" id="ff285a7d-6d87-41a2-9573-09558c3efac6">Watch together</button>
+			<button class="btn btn-primary mt-2" onclick="createParty(event)" id="ff083bff-ab7f-4b87-a61f-5678c1d328e5">Watch together</button>
 		</div>
 		<div class=" t1 col-sm-6 col-md-6 col-lg-4 mb-10 mt-2">
 			<div>A human soldier is sent from 2029 to 1984 to stop an almost indestructible cyborg killing machine, sent from the same year, which has been programmed to execute a young woman whose unborn son is the key to humanity's future salvation.
@@ -48,6 +48,7 @@
         .then(response => response.json())
         .then(data => {
             window.location.replace(data['redirect_url']);
+            // window.location.replace('http://localhost/party-manager-service/api/v1/stream/06547b75-6593-44c2-b4f8-47b4f0b9e426');
         })
     };
 </script>

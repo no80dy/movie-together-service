@@ -15,5 +15,4 @@ async def create_party(
     ],
 ):
     result = await party_manager_service.create_party(party_creation_message)
-    # return {"redirect_url": f"http://localhost:8000/api/v1/stream/{result}"}
     return {"redirect_url": f"http://localhost/party-manager-service/api/v1/stream/{result}"}

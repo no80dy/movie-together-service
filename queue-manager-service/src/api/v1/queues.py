@@ -34,7 +34,6 @@ async def manage_queue(
     film_together = FilmTogether(
         film_id=film_id,
         user_id=user_data.get("user_id"),
-        user_agent=user_agent,
     )
 
     if await queue_service.check_if_client_id_exist(film_together):
