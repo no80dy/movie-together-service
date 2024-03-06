@@ -20,7 +20,7 @@ services:
       - redis
       - rabbitmq
     ports:
-      - "8001:8001"
+      - "8001:8000"
 
   party-manager-service:
     build:
