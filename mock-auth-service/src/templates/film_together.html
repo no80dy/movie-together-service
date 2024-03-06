@@ -47,8 +47,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            // window.location.replace(data['redirect_url']);
-            window.location.replace('http://localhost:8002/party-manager-service/api/v1/stream/1d42710f-6980-4dd4-8a34-fe0d43e7dede');
+            window.location.replace(data['redirect_url']);
         })
     };
 </script>

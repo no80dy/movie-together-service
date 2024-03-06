@@ -90,6 +90,7 @@ async def signin(
         )
 
     user_claims = {
+        "username": user.username,
         "user_id": str(user.user_id),
     }
 
