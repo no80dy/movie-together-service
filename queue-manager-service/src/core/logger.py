@@ -32,7 +32,10 @@ LOGGING = {
         },
     },
     "loggers": {
-        "": {"handlers": ["console_handler", "json_handler"], "level": "DEBUG"},
+        "": {
+            "handlers": ["console_handler", "json_handler"],
+            "level": "DEBUG",
+        },
         "uvicorn.error": {"level": "ERROR"},
         "uvicorn.access": {"handlers": ["console_handler"], "level": "DEBUG"},
     },

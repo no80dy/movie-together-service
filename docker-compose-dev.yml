@@ -1,23 +1,14 @@
 version: '3'
 include:
-  - ./deploy/postgresql/postgresql-dev.yml
   - ./deploy/redis/redis-dev.yml
   - ./deploy/rabbitmq/rabbitmq-dev.yml
   - ./deploy/mongodb/mongodb-dev.yml
-  - ./deploy/minio/minio-dev.yml
 
 services:
   auth-service:
     build:
-      context: ./auth-service/src
+      context: ./mock-auth-service/src
       dockerfile: Dockerfile
-    env_file:
-      - ./auth-service/fastapi.env
-    volumes:
-      - ./auth-service/src/alembic/versions:/app/alembic/versions
-    depends_on:
-      - postgresql
-      - redis
     ports:
       - "8000:8000"
 
@@ -29,7 +20,7 @@ services:
       - redis
       - rabbitmq
     ports:
-      - "8001:8001"
+      - "8001:8000"
 
   party-manager-service:
     build:
@@ -37,7 +28,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mongodb
-      - minio
     env_file:
       - party_manager_service/src/.env.fastapi
     ports:

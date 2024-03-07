@@ -15,7 +15,9 @@ class IBroker(ABC):
         pass
 
     @abstractmethod
-    async def publish_many(self, messages: list[BaseModel], queue: str) -> None:
+    async def publish_many(
+        self, messages: list[BaseModel], queue: str
+    ) -> None:
         pass
 
 
@@ -26,13 +28,15 @@ class RabbitMQBroker(IBroker):
     async def publish_one(self, message: BaseModel, queue: str) -> None:
         await self.broker.publish(message=message, queue=queue)
 
-    async def publish_many(self, messages: list[BaseModel], queue: str) -> None:
+    async def publish_many(
+        self, messages: list[BaseModel], queue: str
+    ) -> None:
         for message in messages:
             await self.broker.publish(message=message, queue=queue)
 
 
 @lru_cache
 def get_message_broker(
-    broker: RabbitBroker = Depends(get_rabbitmq)
+    broker: RabbitBroker = Depends(get_rabbitmq),
 ) -> RabbitMQBroker:
     return RabbitMQBroker(broker)

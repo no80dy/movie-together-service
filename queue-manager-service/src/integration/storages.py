@@ -1,6 +1,6 @@
-from typing import Any, Annotated
 from abc import ABC, abstractmethod
 from functools import lru_cache
+from typing import Annotated, Any
 
 from fastapi import Depends
 from redis.asyncio import Redis
@@ -44,7 +44,5 @@ class RedisStorage(IStorage):
 
 
 @lru_cache
-def get_storage(
-    client: Redis = Depends(get_redis_client)
-) -> IStorage:
+def get_storage(client: Redis = Depends(get_redis_client)) -> IStorage:
     return RedisStorage(client)

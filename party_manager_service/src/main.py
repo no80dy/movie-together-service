@@ -4,7 +4,7 @@ import redis.asyncio as aioredis
 import uvicorn
 from api.v1 import film, stream, websockets
 from core.config import settings
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from faststream.rabbit import RabbitBroker
 from integration import mongodb, rabbitmq, redis
@@ -40,6 +40,30 @@ app = FastAPI(
     openapi_url="/party-manager-service/api/openapi.json",
     lifespan=lifespan,
 )
+
+
+@app.middleware("http")
+async def create_auth_header(
+        request: Request,
+        call_next, ):
+    '''
+    Check if there are cookies set for authorization. If so, construct the
+    Authorization header and modify the request (unless the header already
+    exists!)
+    '''
+    if ("Authorization" not in request.headers
+            and "access_token_cookie" in request.cookies
+    ):
+        access_token = request.cookies["access_token_cookie"]
+
+        request.headers.__dict__["_list"].append(
+            (
+                "authorization".encode(),
+                f"Bearer {access_token}".encode(),
+            )
+        )
+    response = await call_next(request)
+    return response
 
 app.add_middleware(
     CORSMiddleware,
