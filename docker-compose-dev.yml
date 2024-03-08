@@ -47,8 +47,6 @@ services:
     build:
       context: media_service/src
       dockerfile: Dockerfile
-    env_file:
-      - media_service/src/.env.fastapi
     ports:
       - "8000"
 

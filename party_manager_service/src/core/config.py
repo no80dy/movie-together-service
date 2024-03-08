@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     project_name: str = "party-manager-service"
     media_service_url: str = "http://localhost:8003/api/v1/hls"
+    party_manager_service_url: str = \
+        "http://localhost/party-manager-service/api/v1/stream"
 
     mongodb_url: str = "mongodb://localhost:27017/"
     mongodb_database_name: str = "partyDb"

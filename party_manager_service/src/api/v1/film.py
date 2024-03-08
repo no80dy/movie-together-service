@@ -17,4 +17,4 @@ async def create_party(
     ],
 ):
     party_id = await party_manager_service.create_party(party_creation_message)
-    return {"redirect_url": f"{settings.media_service_url}/{party_id}"}
+    return {"redirect_url": f"{settings.party_manager_service_url}/{party_id}"}
