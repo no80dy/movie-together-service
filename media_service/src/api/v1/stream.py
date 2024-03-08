@@ -1,9 +1,8 @@
 from pathlib import Path as FilePath
 from typing import Annotated
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, status
 from fastapi.responses import Response, StreamingResponse
-from fastapi import status
 
 CHUNK_SIZE = 1024
 
@@ -39,7 +38,7 @@ async def stream_hls_video(
     else:
         return Response(
             content="Video file not found",
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
 

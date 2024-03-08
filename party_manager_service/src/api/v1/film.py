@@ -1,10 +1,9 @@
 from typing import Annotated
 
+from core.config import settings
 from fastapi import APIRouter, Depends
 from schemas.broker import PartyCreationMessage
 from services.broker import PartyManagerService, get_party_manager_service
-from core.config import settings
-
 
 router = APIRouter()
 

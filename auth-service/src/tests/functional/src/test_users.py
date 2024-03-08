@@ -1,8 +1,7 @@
-from datetime import datetime
 from http import HTTPStatus
 
 import pytest
-from models.entity import RefreshSession, User, UserLoginHistory
+from models.entity import User
 
 
 @pytest.mark.parametrize(

@@ -36,7 +36,7 @@ async def test_create_group(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -82,7 +82,7 @@ async def test_create_group_with_incorrect_data(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -133,7 +133,7 @@ async def test_read_groups(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -186,7 +186,7 @@ async def test_update_group(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -236,7 +236,7 @@ async def test_update_group_with_incorrect_data(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -274,7 +274,7 @@ async def test_delete_group(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -311,7 +311,7 @@ async def test_delete_group_does_not_exists(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 

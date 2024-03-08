@@ -6,7 +6,7 @@ from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from core.config import settings
 from db import storage
 from db.redis import RedisStorage
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
