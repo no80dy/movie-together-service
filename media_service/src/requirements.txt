@@ -4,5 +4,3 @@ fastapi==0.109.0
 uvicorn==0.27.0
 pydantic==2.5.3
 gunicorn==21.2.0
-pre-commit==3.6.0
-flake8==7.0.0

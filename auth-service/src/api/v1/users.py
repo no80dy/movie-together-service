@@ -5,7 +5,6 @@ from uuid import UUID
 
 import httpx
 from async_fastapi_jwt_auth import AuthJWT
-from async_fastapi_jwt_auth.exceptions import FreshTokenRequired
 from authlib.integrations.starlette_client import OAuth
 from core.config import AuthServersSettings, JWTSettings
 from fastapi import (
@@ -19,7 +18,7 @@ from fastapi import (
     Request,
 )
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 from schemas.entity import (
     GroupAssign,

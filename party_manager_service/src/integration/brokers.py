@@ -37,6 +37,6 @@ class RabbitMQBroker(IBroker):
 
 @lru_cache
 def get_message_broker(
-    broker: Annotated[RabbitBroker, Depends(get_rabbitmq)]
+    broker: Annotated[RabbitBroker, Depends(get_rabbitmq)],
 ) -> RabbitMQBroker:
     return RabbitMQBroker(broker)

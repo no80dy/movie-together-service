@@ -11,8 +11,6 @@ from db.redis import RedisStorage
 from db.storage import TokenHandler, get_nosql_storage
 from fastapi import Depends
 from models.entity import (
-    Group,
-    Permission,
     RefreshSession,
     User,
     UserLoginHistory,
@@ -26,7 +24,7 @@ from schemas.entity import (
     UserLogoutHistoryInDb,
     UserSocialNetworkInDb,
 )
-from sqlalchemy import UUID, and_, delete, func, or_, select, update
+from sqlalchemy import UUID, and_, delete, func, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -367,7 +365,6 @@ class UserService:
         page_size: int,
         page_number: int,
     ) -> list[dict[str, UUID | datetime | str]]:
-
         offset_min, offset_max = await self.calculate_offset(
             page_size, page_number
         )

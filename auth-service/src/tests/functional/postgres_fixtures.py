@@ -2,10 +2,8 @@ import logging
 import sys
 from pathlib import Path
 
-import pytest
 import pytest_asyncio
 from models.entity import RefreshSession, User, UserLoginHistory
-from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -18,13 +16,7 @@ from .settings import test_settings
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 from db.postgres import Base
-from models.entity import (
-    Group,
-    Permission,
-    RefreshSession,
-    User,
-    UserLoginHistory,
-)
+from models.entity import Group, Permission
 
 dsn = (
     f"{test_settings.POSTGRES_SCHEME}://{test_settings.POSTGRES_USER}:"

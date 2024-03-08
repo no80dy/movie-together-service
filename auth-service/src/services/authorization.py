@@ -49,7 +49,6 @@ class AuthorizationChecker:
 
 
 class PermissionClaimsService:
-
     async def required_permissions(
         self, permissions_names: list[str], endpoint_permissions: list[str]
     ):

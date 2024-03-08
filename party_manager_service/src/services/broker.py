@@ -38,6 +38,6 @@ class PartyManagerService:
 
 @lru_cache
 def get_party_manager_service(
-    storage: Annotated[IStorage, Depends(get_storage)]
+    storage: Annotated[IStorage, Depends(get_storage)],
 ) -> PartyManagerService:
     return PartyManagerService(storage)

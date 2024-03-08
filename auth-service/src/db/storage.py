@@ -1,9 +1,6 @@
-import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from http import HTTPStatus
 
-from async_fastapi_jwt_auth import AuthJWT
-from core.config import JWTSettings
 from fastapi import HTTPException
 
 from .redis import INoSQLStorage, RedisStorage

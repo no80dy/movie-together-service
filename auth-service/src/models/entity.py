@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
 
-from core.config import settings
 from db.postgres import Base
 from sqlalchemy import (
     Boolean,
@@ -13,13 +12,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
-from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.orm import Mapped, backref, declarative_base, relationship
+from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 groups_users_table = Table(
