@@ -30,6 +30,6 @@ class RedisCache(ICache):
 
 
 def get_cache(
-    redis_client: Annotated[aioredis.Redis, Depends(get_redis_client)]
+    redis_client: Annotated[aioredis.Redis, Depends(get_redis_client)],
 ):
     return RedisCache(redis_client)

@@ -73,6 +73,6 @@ class MongoStorage(IStorage):
 
 @lru_cache
 def get_storage(
-    client: Annotated[AsyncIOMotorClient, Depends(get_mongo_client)]
+    client: Annotated[AsyncIOMotorClient, Depends(get_mongo_client)],
 ) -> IStorage:
     return MongoStorage(client, settings.mongodb_database_name)

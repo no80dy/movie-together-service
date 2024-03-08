@@ -19,7 +19,7 @@ services:
       - postgresql
       - redis
     ports:
-      - "8000:8000"
+      - "8000"
 
   queue-manager-service:
     build:
@@ -29,7 +29,7 @@ services:
       - redis
       - rabbitmq
     ports:
-      - "8001:8001"
+      - "8001"
 
   party-manager-service:
     build:
@@ -41,16 +41,14 @@ services:
     env_file:
       - party_manager_service/src/.env.fastapi
     ports:
-      - "8002:8000"
+      - "8000"
 
   media-service:
     build:
       context: media_service/src
       dockerfile: Dockerfile
-    env_file:
-      - media_service/src/.env.fastapi
     ports:
-      - "8003:8000"
+      - "8000"
 
   nginx:
     image: nginx:1.19.2

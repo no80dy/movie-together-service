@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from core.config import settings
 from fastapi import APIRouter, Depends
 from schemas.broker import PartyCreationMessage
 from services.broker import PartyManagerService, get_party_manager_service
@@ -14,5 +15,5 @@ async def create_party(
         PartyManagerService, Depends(get_party_manager_service)
     ],
 ):
-    result = await party_manager_service.create_party(party_creation_message)
-    return {"redirect_url": f"http://localhost:8000/api/v1/stream/{result}"}
+    party_id = await party_manager_service.create_party(party_creation_message)
+    return {"redirect_url": f"{settings.party_manager_service_url}/{party_id}"}

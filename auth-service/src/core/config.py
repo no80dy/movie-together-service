@@ -1,10 +1,9 @@
 import os
 from datetime import timedelta
 from logging import config as logging_config
-from typing import Any
 
 from core.logger import LOGGING
-from pydantic import BaseModel, PostgresDsn, ValidationInfo, field_validator
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

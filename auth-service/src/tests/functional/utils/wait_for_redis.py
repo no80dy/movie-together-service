@@ -4,7 +4,6 @@ from pathlib import Path
 
 import backoff
 import redis
-import requests
 from redis import Redis
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))

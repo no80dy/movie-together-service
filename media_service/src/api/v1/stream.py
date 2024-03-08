@@ -1,7 +1,7 @@
 from pathlib import Path as FilePath
 from typing import Annotated
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, status
 from fastapi.responses import Response, StreamingResponse
 
 CHUNK_SIZE = 1024
@@ -12,10 +12,7 @@ current_dir = FilePath(__file__).parents[2]
 
 def generate(m3u8_file_path: FilePath):
     with open(m3u8_file_path, "rb") as video_file:
-        while True:
-            chunk = video_file.read(CHUNK_SIZE)
-            if not chunk:
-                break
+        while chunk := video_file.read(CHUNK_SIZE):
             yield chunk
 
 
@@ -39,7 +36,10 @@ async def stream_hls_video(
             media_type="application/vnd.apple.mpegurl",
         )
     else:
-        return Response(content="Video file not found", status_code=404)
+        return Response(
+            content="Video file not found",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
 
 
 @router.get(

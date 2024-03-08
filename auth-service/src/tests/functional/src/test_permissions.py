@@ -25,7 +25,7 @@ async def test_create_permission(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -51,7 +51,7 @@ async def test_create_permission_duplicate(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -81,7 +81,7 @@ async def test_permission_validation(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -110,7 +110,7 @@ async def test_permissions_read(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -150,7 +150,7 @@ async def test_permission_update(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -163,7 +163,7 @@ async def test_permission_update(
     permission_id = created_permission["body"]["id"]
     result = await make_put_request(
         f"permissions/{permission_id}",
-        {"permission_name": f"new_permission"},
+        {"permission_name": "new_permission"},
         {"Authorization": f"Bearer {access_token}"},
     )
 
@@ -188,7 +188,7 @@ async def test_permission_update_duplicates(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -207,7 +207,7 @@ async def test_permission_update_duplicates(
     permission_id = created_permission["body"]["id"]
     result = await make_put_request(
         f"permissions/{permission_id}",
-        {"permission_name": f"new_permission"},
+        {"permission_name": "new_permission"},
         {"Authorization": f"Bearer {access_token}"},
     )
 
@@ -230,7 +230,7 @@ async def test_permission_update_validation(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -263,7 +263,7 @@ async def test_permission_update_does_not_exists(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -294,7 +294,7 @@ async def test_permission_delete(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
@@ -320,7 +320,7 @@ async def test_permission_delete_does_not_exists(
 ):
     await create_superuser("superuser", "password123")
     result = await make_post_request(
-        f"users/signin", {"username": "superuser", "password": "password123"}
+        "users/signin", {"username": "superuser", "password": "password123"}
     )
     access_token = result["body"]["access_token"]
 
