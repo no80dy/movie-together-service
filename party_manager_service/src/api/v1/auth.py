@@ -14,7 +14,8 @@ def decode_token(token: str) -> Optional[dict]:
             token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
         )
         return decoded_token if decoded_token["exp"] >= time.time() else None
-    except Exception:
+    except Exception as e:
+        print(e)
         return None
 
 
@@ -22,7 +23,7 @@ class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
         super().__init__(auto_error=auto_error)
 
-    async def __call__(self, request: Request) -> str:
+    async def __call__(self, request: Request) -> dict:
         credentials: HTTPAuthorizationCredentials = await super().__call__(
             request
         )
@@ -42,7 +43,8 @@ class JWTBearer(HTTPBearer):
                 status_code=http.HTTPStatus.FORBIDDEN,
                 detail="Invalid or expired token.",
             )
-        return credentials.credentials
+        # return credentials.credentials
+        return decoded_token
 
     @staticmethod
     def parse_token(jwt_token: str) -> Optional[dict]:

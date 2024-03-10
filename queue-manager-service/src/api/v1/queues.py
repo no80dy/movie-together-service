@@ -38,7 +38,7 @@ async def manage_queue(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="Вы пытаетесь зайти с неизвестного устройства",
         )
-
+    print('user_data: ', user_data)
     film_together = FilmTogether(
         film_id=film_id,
         user_id=user_data.get("user_id"),
