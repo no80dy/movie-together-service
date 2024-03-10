@@ -4,9 +4,9 @@ import uvicorn
 from api.v1 import queues, websockets
 from core.config import settings
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from faststream.rabbit import RabbitBroker
 from integration import rabbitmq, redis
-from motor.motor_asyncio import AsyncIOMotorClient
 from redis.asyncio import Redis
 
 
@@ -35,8 +35,8 @@ app = FastAPI(
     description="Сервис поиска людей для совместного просмотра фильма",
     version="0.0.0",
     title=settings.project_name,
-    docs_url="/queue/api/openapi",
-    openapi_url="/queue/api/openapi.json",
+    docs_url="/queue-manager-service/api/openapi",
+    openapi_url="/queue-manager-service/api/openapi.json",
     lifespan=lifespan,
 )
 
@@ -64,12 +64,13 @@ async def create_auth_header(
     response = await call_next(request)
     return response
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(
-    queues.router, prefix="/queues/api/v1", tags=["films_queues"]
+    queues.router, prefix="/queue-manager-service/api/v1/queues", tags=["films_queues"]
 )
 app.include_router(
-    websockets.router, prefix="/waiting_party/api/v1", tags=["waiting_party"]
+    websockets.router, prefix="/queue-manager-service/api/v1/waiting_party", tags=["waiting_party"]
 )
 
 

@@ -9,16 +9,21 @@ class FilmTogether(BaseModel):
     user_agent: str
 
 
+class PartyMember(BaseModel):
+    client_id: str
+    user_id: uuid.UUID
+    user_agent: str
+
 # class InputWSPayloads(BaseModel):
 #     film_id: uuid.UUID
 #     client_id: str
 
 
-class PartyMember(BaseModel):
-    user_id: uuid.UUID
-    user_agent: str
+# Для сервиса party-manager-service
+# class OutputPartyMember(BaseModel):
+#     user_id: uuid.UUID
 
 
 class OutputPartyPayloads(BaseModel):
     film_id: uuid.UUID
-    members: list[PartyMember]
+    members: list[uuid.UUID]

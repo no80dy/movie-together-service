@@ -1,0 +1,12 @@
+h1 {
+    color: green;
+}
+
+select:invalid {
+    color: grey;
+}
+
+.WidthSpan {
+    width: 200px;
+    display: inline-block;
+}

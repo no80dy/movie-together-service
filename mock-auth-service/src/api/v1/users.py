@@ -51,7 +51,7 @@ async def login(
     if authorized:
         user_claims = await Authorize.get_raw_jwt()
         return templates.TemplateResponse(
-            name="film_together.html",
+            name="loading.html",
             context={
                 "request": request,
                 "user_id": user_claims['user_id'],
@@ -103,7 +103,7 @@ async def signin(
     )
 
     response = templates.TemplateResponse(
-        name="film_together.html",
+        name="loading.html",
         context={
             "request": request,
             "user_id": user_claims['user_id'],
