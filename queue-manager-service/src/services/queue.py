@@ -122,16 +122,19 @@ class QueueService:
         queue_id: str,
         client_id: str,
     ):
-        queue = json.loads(await self.get_queue(queue_id))
-        if queue['amount'] > 1:
-            queue["amount"] -= 1
-            updated_members = [json.loads(member) for member in queue["members"] if json.loads(member)["client_id"] != client_id]
-            queue['members'] = updated_members
-            await self.storage.set(
-                queue_id, json.dumps(queue), MAX_PARTY_WAITING_TIME
-            )
-        else:
-            await self.delete_queue(queue_id)
+        queue = await self.get_queue(queue_id)
+        if queue:
+            queue = json.loads(await self.get_queue(queue_id))
+            if queue['amount'] > 1:
+                queue["amount"] -= 1
+                updated_members = [json.loads(member) for member in queue["members"] if json.loads(member)["client_id"] != client_id]
+                queue['members'] = updated_members
+                await self.storage.set(
+                    queue_id, json.dumps(queue), MAX_PARTY_WAITING_TIME
+                )
+            else:
+                await self.delete_queue(queue_id)
+
 
     async def delete_queue(
         self,

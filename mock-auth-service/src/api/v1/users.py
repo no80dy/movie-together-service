@@ -51,7 +51,7 @@ async def login(
     if authorized:
         user_claims = await Authorize.get_raw_jwt()
         return templates.TemplateResponse(
-            name="loading.html",
+            name="film_together.html",
             context={
                 "request": request,
                 "user_id": user_claims['user_id'],
@@ -103,7 +103,7 @@ async def signin(
     )
 
     response = templates.TemplateResponse(
-        name="loading.html",
+        name="film_together.html",
         context={
             "request": request,
             "user_id": user_claims['user_id'],
@@ -138,17 +138,17 @@ async def protected(Authorize: AuthJWT = Depends()):
     return {"username": username}
 
 
-@router.post(
-    path="/film_together",
-    status_code=HTTPStatus.OK,
-    summary="Страница совместного просмотра фильма",
-)
-async def film_together(
-    request: Request,
-    film_id: str = Form(),
-    Authorize: AuthJWT = Depends(),
-):
-    """Страница выбора фильма для совместного просмотра."""
-    await Authorize.jwt_required()
-
-    return JSONResponse(content={"msg": film_id})
+# @router.post(
+#     path="/film_together",
+#     status_code=HTTPStatus.OK,
+#     summary="Страница совместного просмотра фильма",
+# )
+# async def film_together(
+#     request: Request,
+#     film_id: str = Form(),
+#     Authorize: AuthJWT = Depends(),
+# ):
+#     """Страница выбора фильма для совместного просмотра."""
+#     await Authorize.jwt_required()
+#
+#     return JSONResponse(content={"msg": film_id})

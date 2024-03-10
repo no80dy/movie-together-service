@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     async function getUser() {
-        const response = await fetch("http://localhost:8000/auth/api/v1/users/protected", {});
+        const response = await fetch("http://localhost/auth/api/v1/users/protected", {});
         const data = await response.json();
         return data['username'];
     };

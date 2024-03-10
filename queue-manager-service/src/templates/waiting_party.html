@@ -26,7 +26,7 @@
 <script>
         let client_id = document.querySelector("#client_id").value;
 
-        let ws = new WebSocket(`ws://localhost/queue-manager-service/api/v1/waiting_party/ws/${client_id}`);
+        let ws = new WebSocket(`ws://localhost:8001/queue-manager-service/api/v1/waiting_party/ws/${client_id}`);
         ws.onmessage = function(event) {
             let messages = document.getElementById('messages');
             if (event.data === '__start_watching__') {

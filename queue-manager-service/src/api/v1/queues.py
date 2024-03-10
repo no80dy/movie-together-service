@@ -61,7 +61,10 @@ async def manage_queue(
             }
         )
     else:
-        RedirectResponse('/start')
+        return RedirectResponse(
+            url='http://localhost:8001/queue-manager-service/api/v1/queues/start',
+            status_code=HTTPStatus.FOUND,
+        )
 
 
 @router.get(
