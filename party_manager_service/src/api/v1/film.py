@@ -1,3 +1,4 @@
+import json
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -29,8 +30,8 @@ async def check_party_id(
     ],
 ):
     """Проверяет готовность пати для фронта."""
-    print(user_data)
     result = await party_manager_service.find_party_id_by_user_id(user_data["user_id"])
     if not result:
         return {"redirect_url": "None"}
-    return {"redirect_url": f"http://localhost/party-manager-service/api/v1/stream/{result}"}
+    print(result)
+    return {"redirect_url": f"http://localhost/party-manager-service/api/v1/stream/{result['party_id']}"}

@@ -26,4 +26,4 @@ class PartyMember(BaseModel):
 
 class OutputPartyPayloads(BaseModel):
     film_id: uuid.UUID
-    members: list[uuid.UUID]
+    users_ids: list[uuid.UUID]

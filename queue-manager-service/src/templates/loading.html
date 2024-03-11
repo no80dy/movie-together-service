@@ -12,18 +12,18 @@
 
 <script>
 	function isPartyReady(event) {
-		fetch('http://localhost:8002/party-manager-service/api/v1/broker/party-ready', {
+		fetch('http://localhost/party-manager-service/api/v1/film/party-ready', {
 			method: 'GET',
 		})
 		.then(response => response.json())
 		.then(data => {
 			console.log(data);
 			if (data["redirect_url"] != "None") {
-				// window.location.replace(data['redirect_url']);
+				window.location.replace(data['redirect_url']);
 			}
 		})
 	};
-	let intervalId = setInterval(isPartyReady, 1000);
+	let intervalId = setInterval(isPartyReady, 3000);
 </script>
 
 

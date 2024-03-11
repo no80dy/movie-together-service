@@ -25,7 +25,7 @@
 <!--		</div>-->
 		<!-- Film 2 -->
 		<div class=" t2 col-sm-6 col-md-6 col-lg-2 mb-10 mt-2">
-			<form action="http://localhost:8001/queue-manager-service/api/v1/queues/film_together", method="post">
+			<form action="http://localhost/queue-manager-service/api/v1/queues/film_together", method="post">
 				<img src="{{ url_for('static', path='/img/t2.png') }}" class="img-fluid rounded" alt="t1">
 				<div>A cyborg, identical to the one who failed to kill Sarah Connor, must now protect her ten year old son John from an even more advanced and powerful cyborg.
 				</div>
@@ -52,7 +52,7 @@
 
         console.log(JSON.stringify(party_creation_message));
 
-        fetch('http://localhost:8002/party-manager-service/api/v1/broker/party-creation', {
+        fetch('http://localhost/party-manager-service/api/v1/broker/party-creation', {
             method: 'POST',
             headers: {
             	'Content-Type': 'application/json'
@@ -70,7 +70,7 @@
         user_id = document.querySelector('#user_id').value;
         film_id = event.srcElement.id;
 
-        fetch('http://localhost:8001/queue-manager-service/api/v1/queues/film_together', {
+        fetch('http://localhost/queue-manager-service/api/v1/queues/film_together', {
             method: 'POST',
             headers: {
             	'Content-Type': 'application/json'

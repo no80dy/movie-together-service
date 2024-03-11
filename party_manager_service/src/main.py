@@ -7,6 +7,7 @@ from core.config import settings
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from faststream.rabbit import RabbitBroker
+# from faststream.rabbit.fastapi import RabbitRouter
 from integration import mongodb, rabbitmq, redis
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -14,18 +15,23 @@ from motor.motor_asyncio import AsyncIOMotorClient
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     mongodb.mongo_client = AsyncIOMotorClient(settings.mongodb_url)
-    rabbitmq.rabbitmq_broker = RabbitBroker(
-        host=settings.rabbitmq_host,
-        port=settings.rabbitmq_port,
-        login=settings.rabbitmq_login,
-        password=settings.rabbitmq_password,
-    )
+    # rabbitmq.rabbitmq_broker = RabbitBroker(
+    #     host=settings.rabbitmq_host,
+    #     port=settings.rabbitmq_port,
+    #     login=settings.rabbitmq_login,
+    #     password=settings.rabbitmq_password,
+    # )
     redis.redis_client = aioredis.Redis(
         host=settings.redis_host, port=settings.redis_port
     )
-    await rabbitmq.rabbitmq_broker.connect()
-    await rabbitmq.configure_rabbit_queues()
-    await rabbitmq.configure_rabbit_exchange()
+    # await rabbitmq.rabbitmq_broker.connect()
+    # await rabbitmq.configure_rabbit_queues()
+    # await rabbitmq.configure_rabbit_exchange()
+    async with (
+        broker.router.lifespan_context(app),
+    ):
+        yield
+    # broker.router.lifespan_context(app)
     yield
     await redis.redis_client.close()
     await rabbitmq.rabbitmq_broker.close()
@@ -38,7 +44,8 @@ app = FastAPI(
     title=settings.project_name,
     docs_url="/party-manager-service/api/openapi",
     openapi_url="/party-manager-service/api/openapi.json",
-    lifespan=lifespan,
+    # lifespan=lifespan,
+    lifespan=lifespan
 )
 
 
@@ -75,8 +82,8 @@ app.add_middleware(
 
 app.include_router(
     film.router,
-    prefix="/party-manager-service/api/v1/broker",
-    tags=["RabbitMQ"],
+    prefix="/party-manager-service/api/v1/film",
+    tags=["HTTP"],
 )
 app.include_router(
     stream.router, prefix="/party-manager-service/api/v1/stream", tags=["HLS"]
@@ -86,7 +93,8 @@ app.include_router(
 )
 app.include_router(
     broker.router,
-    prefix="/party-manager-service/api/v1/broker"
+    prefix="/party-manager-service/api/v1/broker",
+    tags=["RabbitMQ"],
 )
 
 if __name__ == "__main__":

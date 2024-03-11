@@ -38,7 +38,6 @@ async def manage_queue(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="Вы пытаетесь зайти с неизвестного устройства",
         )
-    print('user_data: ', user_data)
     film_together = FilmTogether(
         film_id=film_id,
         user_id=user_data.get("user_id"),
@@ -62,7 +61,7 @@ async def manage_queue(
         )
     else:
         return RedirectResponse(
-            url='http://localhost:8001/queue-manager-service/api/v1/queues/start',
+            url='http://localhost/queue-manager-service/api/v1/queues/start',
             status_code=HTTPStatus.FOUND,
         )
 

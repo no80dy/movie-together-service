@@ -17,3 +17,4 @@ motor==3.3.2
 redis==5.0.2
 
 faststream==0.3.14
+faststream[rabbit]

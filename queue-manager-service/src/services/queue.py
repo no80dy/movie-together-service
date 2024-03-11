@@ -72,7 +72,7 @@ class QueueService:
             users_ids = [json.loads(member)["user_id"] for member in queue["members"]]
             party = OutputPartyPayloads(
                 film_id=film_id,
-                members=users_ids,
+                users_ids=users_ids,
             )
             # Отправить в брокер сообщений
             await self.broker.publish_one(party, settings.rabbitmq_queue_name),

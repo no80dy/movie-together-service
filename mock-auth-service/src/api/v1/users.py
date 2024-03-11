@@ -136,19 +136,3 @@ async def protected(Authorize: AuthJWT = Depends()):
     # If no jwt is sent in the request, get_jwt_subject() will return None
     username = await Authorize.get_jwt_subject()
     return {"username": username}
-
-
-# @router.post(
-#     path="/film_together",
-#     status_code=HTTPStatus.OK,
-#     summary="Страница совместного просмотра фильма",
-# )
-# async def film_together(
-#     request: Request,
-#     film_id: str = Form(),
-#     Authorize: AuthJWT = Depends(),
-# ):
-#     """Страница выбора фильма для совместного просмотра."""
-#     await Authorize.jwt_required()
-#
-#     return JSONResponse(content={"msg": film_id})
