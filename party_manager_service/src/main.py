@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 import redis.asyncio as aioredis
 import uvicorn
-from api.v1 import film, stream, websockets
+from api.v1 import film, stream, websockets, broker
 from core.config import settings
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -83,6 +83,10 @@ app.include_router(
 )
 app.include_router(
     websockets.router, prefix="/party-manager-service", tags=["WebSockets"]
+)
+app.include_router(
+    broker.router,
+    prefix="/party-manager-service/api/v1/broker"
 )
 
 if __name__ == "__main__":
