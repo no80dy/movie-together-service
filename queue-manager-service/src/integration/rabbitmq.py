@@ -12,14 +12,16 @@ rabbitmq_broker: RabbitBroker | None = None
 async def configure_rabbit_exchange():
     await rabbitmq_broker.declare_exchange(
         RabbitExchange(
-            name=settings.rabbitmq_exchange_name, type=ExchangeType.FANOUT
+            name=settings.rabbitmq_exchange_name,
+            type=ExchangeType.FANOUT,
+            durable=False,
         )
     )
 
 
 async def configure_rabbit_queues():
     await rabbitmq_broker.declare_queue(
-        RabbitQueue(name=settings.rabbitmq_queue_name, durable=True)
+        RabbitQueue(name=settings.rabbitmq_queue_name, durable=False)
     )
 
     await rabbitmq_broker.declare_queue(
