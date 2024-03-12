@@ -8,16 +8,12 @@ from core.config import JWTSettings
 from db.users import users_db
 from fastapi import (
     APIRouter,
-    Body,
     Depends,
     Form,
-    Header,
     HTTPException,
-    Path,
-    Query,
     Request,
 )
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
 from models.models import User

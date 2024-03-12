@@ -3,12 +3,13 @@ from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from schemas.entity import FilmTogether
 from services.queue import QueueService, get_queue_service
 
 from .auth import security_jwt
+
 
 router = APIRouter()
 
@@ -24,6 +25,7 @@ templates = Jinja2Templates(directory="templates")
 async def manage_queue(
     request: Request,
     user_data: Annotated[dict, Depends(security_jwt)],
+    # film_id: FilmID,
     film_id: uuid.UUID = Form(),
     user_agent: Annotated[str | None, Header()] = None,
     queue_service: QueueService = Depends(get_queue_service),
@@ -38,6 +40,7 @@ async def manage_queue(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="Вы пытаетесь зайти с неизвестного устройства",
         )
+    # film_id = film_id.model_dump()["film_id"]
     film_together = FilmTogether(
         film_id=film_id,
         user_id=user_data.get("user_id"),
