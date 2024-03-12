@@ -10,7 +10,6 @@ from services.queue import QueueService, get_queue_service
 
 from .auth import security_jwt
 
-
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
@@ -60,17 +59,17 @@ async def manage_queue(
             context={
                 "request": request,
                 "client_id": client_id,
-            }
+            },
         )
     else:
         return RedirectResponse(
-            url='http://localhost/queue-manager-service/api/v1/queues/start',
+            url="http://localhost/queue-manager-service/api/v1/queues/start",
             status_code=HTTPStatus.FOUND,
         )
 
 
 @router.get(
-    '/start',
+    "/start",
     summary="Ожидание начала показа фильма",
 )
 async def start(
@@ -81,5 +80,5 @@ async def start(
         name="loading.html",
         context={
             "request": request,
-        }
+        },
     )

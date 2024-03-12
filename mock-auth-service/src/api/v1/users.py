@@ -2,18 +2,11 @@ from http import HTTPStatus
 
 from async_fastapi_jwt_auth import AuthJWT
 from core.config import JWTSettings
-from fastapi import (
-    APIRouter,
-    Depends,
-    Form,
-    HTTPException,
-    Request,
-)
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
 from services.user import UserService, get_user_service
-
 
 security = HTTPBearer()
 router = APIRouter()
@@ -46,7 +39,7 @@ async def login(
             name="film_together.html",
             context={
                 "request": request,
-                "user_id": user_claims['user_id'],
+                "user_id": user_claims["user_id"],
             },
         )
     else:
@@ -98,7 +91,7 @@ async def signin(
         name="film_together.html",
         context={
             "request": request,
-            "user_id": user_claims['user_id'],
+            "user_id": user_claims["user_id"],
         },
     )
 

@@ -10,7 +10,6 @@ from integration.websocket import (
     WebSocketRouteTable,
     get_websocket_route_table,
 )
-
 from services.client_id import ClientIDService, get_client_id_service
 
 
@@ -37,7 +36,9 @@ class WebSocketService:
         self.websocket_route_table.remove_connection(film_id, websocket)
 
     async def broadcast(self, film_id: str, message: str):
-        connections = self.websocket_route_table.get_websocket_by_film_id(film_id)
+        connections = self.websocket_route_table.get_websocket_by_film_id(
+            film_id
+        )
         for connection in connections:
             try:
                 await connection.send_text(message)
@@ -51,6 +52,6 @@ def get_websocket_service(
     websocket_route_table: WebSocketRouteTable = Depends(
         get_websocket_route_table
     ),
-    client_id_service: ClientIDService = Depends(get_client_id_service)
+    client_id_service: ClientIDService = Depends(get_client_id_service),
 ):
     return WebSocketService(storage, websocket_route_table, client_id_service)

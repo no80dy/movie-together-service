@@ -1,6 +1,6 @@
 import uuid
-from functools import lru_cache
 from collections import defaultdict
+from functools import lru_cache
 
 from fastapi import WebSocket
 

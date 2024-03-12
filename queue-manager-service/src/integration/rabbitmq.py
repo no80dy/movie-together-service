@@ -12,7 +12,9 @@ rabbitmq_broker: RabbitBroker | None = None
 async def configure_rabbit_exchange():
     await rabbitmq_broker.declare_exchange(
         RabbitExchange(
-            name=settings.rabbitmq_exchange_name, type=ExchangeType.FANOUT, durable=False
+            name=settings.rabbitmq_exchange_name,
+            type=ExchangeType.FANOUT,
+            durable=False,
         )
     )
 

@@ -1,11 +1,10 @@
 from typing import Annotated
 
+from core.config import settings
 from fastapi import Depends
 from faststream.rabbit.fastapi import RabbitRouter
-from core.config import settings
 from schemas.broker import PartyCreationMessage
 from services.broker import PartyManagerService, get_party_manager_service
-
 
 router = RabbitRouter(
     host=settings.rabbitmq_host,

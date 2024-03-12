@@ -19,9 +19,7 @@ class ClientIDService:
         return Fernet(settings.client_id_key).decrypt(token)
 
     @staticmethod
-    def make_client_id(
-        film_together: FilmTogether
-    ) -> str:
+    def make_client_id(film_together: FilmTogether) -> str:
         """Создание уникального идентификатора для клиента."""
         film_together_dto = film_together.model_dump()
         film_id = film_together_dto.get("film_id")

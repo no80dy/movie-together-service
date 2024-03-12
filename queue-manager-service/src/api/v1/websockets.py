@@ -3,8 +3,8 @@ import uuid
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from services.client_id import ClientIDService, get_client_id_service
-from services.websocket import WebSocketService, get_websocket_service
 from services.queue import QueueService, get_queue_service
+from services.websocket import WebSocketService, get_websocket_service
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ async def websocket_endpoint(
 ):
     film_id = client_id_service.get_film_id_from_client_id(client_id)
     await websocket_service.connect(film_id, websocket)
-    await websocket_service.broadcast(film_id, 'yeah boy')
+    await websocket_service.broadcast(film_id, "yeah boy")
     try:
         while True:
             data = await websocket.receive_text()

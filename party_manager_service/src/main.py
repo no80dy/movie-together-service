@@ -2,11 +2,12 @@ from contextlib import asynccontextmanager
 
 import redis.asyncio as aioredis
 import uvicorn
-from api.v1 import film, stream, websockets, broker
+from api.v1 import broker, film, stream, websockets
 from core.config import settings
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from faststream.rabbit import RabbitBroker
+
 # from faststream.rabbit.fastapi import RabbitRouter
 from integration import mongodb, rabbitmq, redis
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -15,21 +16,14 @@ from motor.motor_asyncio import AsyncIOMotorClient
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     mongodb.mongo_client = AsyncIOMotorClient(settings.mongodb_url)
-    # rabbitmq.rabbitmq_broker = RabbitBroker(
-    #     host=settings.rabbitmq_host,
-    #     port=settings.rabbitmq_port,
-    #     login=settings.rabbitmq_login,
-    #     password=settings.rabbitmq_password,
-    # )
+
     redis.redis_client = aioredis.Redis(
         host=settings.redis_host, port=settings.redis_port
     )
     # await rabbitmq.rabbitmq_broker.connect()
     # await rabbitmq.configure_rabbit_queues()
     # await rabbitmq.configure_rabbit_exchange()
-    async with (
-        broker.router.lifespan_context(app),
-    ):
+    async with (broker.router.lifespan_context(app),):
         yield
     # broker.router.lifespan_context(app)
     yield
@@ -45,21 +39,23 @@ app = FastAPI(
     docs_url="/party-manager-service/api/openapi",
     openapi_url="/party-manager-service/api/openapi.json",
     # lifespan=lifespan,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
 @app.middleware("http")
 async def create_auth_header(
-        request: Request,
-        call_next, ):
-    '''
+    request: Request,
+    call_next,
+):
+    """
     Check if there are cookies set for authorization. If so, construct the
     Authorization header and modify the request (unless the header already
     exists!)
-    '''
-    if ("Authorization" not in request.headers
-            and "access_token_cookie" in request.cookies
+    """
+    if (
+        "Authorization" not in request.headers
+        and "access_token_cookie" in request.cookies
     ):
         access_token = request.cookies["access_token_cookie"]
 
@@ -71,6 +67,7 @@ async def create_auth_header(
         )
     response = await call_next(request)
     return response
+
 
 app.add_middleware(
     CORSMiddleware,

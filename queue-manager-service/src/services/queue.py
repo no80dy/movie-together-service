@@ -6,7 +6,7 @@ from core.config import settings
 from fastapi import Depends
 from integration.brokers import RabbitMQBroker, get_message_broker
 from integration.storages import RedisStorage, get_storage
-from schemas.entity import FilmTogether, PartyMember, OutputPartyPayloads
+from schemas.entity import FilmTogether, OutputPartyPayloads, PartyMember
 from services.client_id import ClientIDService, get_client_id_service
 from services.websocket import WebSocketService, get_websocket_service
 
@@ -16,6 +16,7 @@ MAX_PARTY_WAITING_TIME = 10 * 60  # 10 мин
 
 class QueueService:
     """queue_id в данном случае есть film_id"""
+
     def __init__(
         self,
         broker: RabbitMQBroker,
@@ -42,7 +43,9 @@ class QueueService:
 
         queue = json.loads(queue)
         print(queue)
-        members_client_id = [json.loads(member)["client_id"] for member in queue["members"]]
+        members_client_id = [
+            json.loads(member)["client_id"] for member in queue["members"]
+        ]
         if client_id in members_client_id:
             return True
         return False
@@ -50,7 +53,6 @@ class QueueService:
     async def handle_queue(
         self,
         film_together: FilmTogether,
-
     ) -> str | None:
         client_id = self.client_id_service.make_client_id(film_together)
         film_together_dto = film_together.model_dump()
@@ -69,17 +71,21 @@ class QueueService:
         await self.add_to_queue(film_id, member)
         queue = json.loads(await self.get_queue(film_id))
         if queue.get("amount") == AMOUNT_MEMBERS_IN_PARTY:
-            users_ids = [json.loads(member)["user_id"] for member in queue["members"]]
+            users_ids = [
+                json.loads(member)["user_id"] for member in queue["members"]
+            ]
             party = OutputPartyPayloads(
                 film_id=film_id,
                 users_ids=users_ids,
             )
             # Отправить в брокер сообщений
             await self.broker.publish_one(party, settings.rabbitmq_queue_name),
-            print('Отправил в брокер')
+            print("Отправил в брокер")
 
             # TODO Оборвать вебсокет и редиректнуть куда-то, кто будет дерагать ручку пати менеджера каждую секунду о начале
-            await self.websocket_service.broadcast(film_id, '__start_watching__')
+            await self.websocket_service.broadcast(
+                film_id, "__start_watching__"
+            )
             # Удалить очередь
             await self.delete_queue(film_id)
             return None
@@ -90,7 +96,6 @@ class QueueService:
         self,
         queue_id: str,
         member: PartyMember,
-
     ):
         queue = {"amount": 1, "members": [member.model_dump_json()]}
         await self.storage.set(
@@ -100,7 +105,6 @@ class QueueService:
     async def get_queue(
         self,
         queue_id: str,
-
     ):
         return await self.storage.get(queue_id)
 
@@ -125,21 +129,21 @@ class QueueService:
         queue = await self.get_queue(queue_id)
         if queue:
             queue = json.loads(await self.get_queue(queue_id))
-            if queue['amount'] > 1:
+            if queue["amount"] > 1:
                 queue["amount"] -= 1
-                updated_members = [json.loads(member) for member in queue["members"] if json.loads(member)["client_id"] != client_id]
-                queue['members'] = updated_members
+                updated_members = [
+                    json.loads(member)
+                    for member in queue["members"]
+                    if json.loads(member)["client_id"] != client_id
+                ]
+                queue["members"] = updated_members
                 await self.storage.set(
                     queue_id, json.dumps(queue), MAX_PARTY_WAITING_TIME
                 )
             else:
                 await self.delete_queue(queue_id)
 
-
-    async def delete_queue(
-        self,
-        queue_id: str
-    ):
+    async def delete_queue(self, queue_id: str):
         await self.storage.delete(queue_id)
 
 
