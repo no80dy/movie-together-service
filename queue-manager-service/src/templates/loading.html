@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="conteiner-fluid mx-4">
+	<input type="text" id="user_id" value="{{ user_id }}" hidden>
+	<h1>Фильм скоро начнется...</h1>
+
+<label for="file">Буферизация:</label>
+<progress id="file" value="32" max="100"> 32% </progress>
+</div>
+
+<script>
+	function isPartyReady(event) {
+		fetch('http://localhost/party-manager-service/api/v1/film/party-ready', {
+			method: 'GET',
+		})
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+			if (data["redirect_url"] != "None") {
+				window.location.replace(data['redirect_url']);
+			}
+		})
+	};
+	let intervalId = setInterval(isPartyReady, 3000);
+</script>
+
+
+{% endblock %}

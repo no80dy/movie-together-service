@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import uuid
 from functools import lru_cache
 
@@ -9,6 +10,7 @@ from integration.websocket import (
     WebSocketRouteTable,
     get_websocket_route_table,
 )
+from services.client_id import ClientIDService, get_client_id_service
 
 
 class WebSocketService:
@@ -16,38 +18,32 @@ class WebSocketService:
         self,
         storage: RedisStorage,
         websocket_route_table: WebSocketRouteTable,
+        client_id_service: ClientIDService,
     ):
         self.storage = storage
         self.websocket_route_table = websocket_route_table
+        self.client_id_service = client_id_service
 
-    async def connect(self, client_id: str, websocket: WebSocket) -> None:
+    async def connect(self, film_id: str, websocket: WebSocket) -> None:
         await websocket.accept()
-        self.websocket_route_table.add_pair_in_table(client_id, websocket)
-        # while True:
-        #     await asyncio.sleep(1)
-
-    async def reconnect(
-        self,
-        client_id: str,
-    ) -> None:
-        """Подключение клиента повторно"""
-        # где-то хранить какие фильмы сейчас идут -> Реконект не нужен, смотите заново
-        pass
+        self.websocket_route_table.add_connection(film_id, websocket)
 
     def disconnect(
         self,
-        client_id: str,
+        film_id: str,
+        websocket: WebSocket,
     ) -> None:
-        self.websocket_route_table.remove_pair_in_table(client_id)
-        # TODO удалить из редиса как-то, а как реконнект делать, если вся информация удалится
+        self.websocket_route_table.remove_connection(film_id, websocket)
 
-    async def broadcast(self, film_id: uuid.UUID, message: str):
-        """Достает из редиса по айди фильма список юзеров и им рассылает."""
-        queue = json.loads(await self.storage.get(str(film_id)))
-        client_ids = [user["client_id"] for user in queue["members"]]
-        for client_id in client_ids:
-            connection = self.websocket_route_table.connections.get(client_id)
-            await connection.send_text(message)
+    async def broadcast(self, film_id: str, message: str):
+        connections = self.websocket_route_table.get_websocket_by_film_id(
+            film_id
+        )
+        for connection in connections:
+            try:
+                await connection.send_text(message)
+            except AttributeError as e:
+                logging.error(e)
 
 
 @lru_cache
@@ -56,5 +52,6 @@ def get_websocket_service(
     websocket_route_table: WebSocketRouteTable = Depends(
         get_websocket_route_table
     ),
+    client_id_service: ClientIDService = Depends(get_client_id_service),
 ):
-    return WebSocketService(storage, websocket_route_table)
+    return WebSocketService(storage, websocket_route_table, client_id_service)

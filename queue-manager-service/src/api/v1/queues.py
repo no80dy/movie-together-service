@@ -2,14 +2,17 @@ import uuid
 from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, Header, HTTPException
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request
+from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
 from schemas.entity import FilmTogether
 from services.queue import QueueService, get_queue_service
 
 from .auth import security_jwt
 
 router = APIRouter()
+
+templates = Jinja2Templates(directory="templates")
 
 
 @router.post(
@@ -19,21 +22,28 @@ router = APIRouter()
     response_description="Перенаправление на страницу ожидания",
 )
 async def manage_queue(
+    request: Request,
+    user_data: Annotated[dict, Depends(security_jwt)],
+    # film_id: FilmID,
     film_id: uuid.UUID = Form(),
-    # user_data: Annotated[dict, Depends(security_jwt)],
+    user_agent: Annotated[str | None, Header()] = None,
     queue_service: QueueService = Depends(get_queue_service),
-) -> RedirectResponse:
+):
     """
     Пользователь, который хочет посмотреть фильм, добавляется в очередь ожидания.
     При наборе определенного количества пользователей для данной группы пользователей
     отправляется запрос на создание сеанса просмотра.
     """
-    # for test
-    user_data = {"user_id": "86830a5a-4b8c-4ea3-91f6-a2b6e03bdc50"}
-
+    if not user_agent:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Вы пытаетесь зайти с неизвестного устройства",
+        )
+    # film_id = film_id.model_dump()["film_id"]
     film_together = FilmTogether(
         film_id=film_id,
         user_id=user_data.get("user_id"),
+        user_agent=user_agent,
     )
 
     if await queue_service.check_if_client_id_exist(film_together):
@@ -42,7 +52,33 @@ async def manage_queue(
             detail="Данный пользователь уже ожидает начало совместного просмотра данного фильма с данного устройства ",
         )
 
-    await queue_service.handle_queue(film_together)
-    return RedirectResponse(
-        "/waiting_party/api/v1", status_code=HTTPStatus.FOUND
+    client_id = await queue_service.handle_queue(film_together)
+    if client_id:
+        return templates.TemplateResponse(
+            name="waiting_party.html",
+            context={
+                "request": request,
+                "client_id": client_id,
+            },
+        )
+    else:
+        return RedirectResponse(
+            url="http://localhost/queue-manager-service/api/v1/queues/start",
+            status_code=HTTPStatus.FOUND,
+        )
+
+
+@router.get(
+    "/start",
+    summary="Ожидание начала показа фильма",
+)
+async def start(
+    request: Request,
+    user_data: Annotated[dict, Depends(security_jwt)],
+):
+    return templates.TemplateResponse(
+        name="loading.html",
+        context={
+            "request": request,
+        },
     )

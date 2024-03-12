@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        let ws_chat = new WebSocket("ws://localhost:8002/party-manager-service/ws{{ websocket_chat_link }}");
+        let ws_chat = new WebSocket("ws://localhost/party-manager-service/ws{{ websocket_chat_link }}");
         ws_chat.onmessage = function (event) {
             const messages = document.getElementById('messages');
             const message = document.createElement('li');
@@ -65,7 +65,7 @@
                     };
 
                     const player = new Plyr(video, playerOptions);
-                    let ws_stream = new WebSocket("ws://localhost:8002/party-manager-service/ws{{ websocket_stream_link }}");
+                    let ws_stream = new WebSocket("ws://localhost/party-manager-service/ws{{ websocket_stream_link }}");
 
                     ws_stream.onmessage = function(event) {
                         const consumedData = JSON.parse(event.data);

@@ -35,6 +35,16 @@ class PartyManagerService:
         except Exception as e:
             print(e)
 
+    async def find_party_id_by_user_id(
+        self, user_id: uuid.UUID
+    ) -> dict | None:
+        try:
+            return await self.storage.find_element_by_properties(
+                {"users_ids": {"$in": [str(user_id)]}}, "parties"
+            )
+        except Exception as e:
+            print(e)
+
 
 @lru_cache
 def get_party_manager_service(

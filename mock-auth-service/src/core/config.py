@@ -23,7 +23,6 @@ class JWTSettings(BaseModel):
     # authjwt_header_name: str = "Authorization"
     # authjwt_header_type: str = "Bearer"
     authjwt_token_location: set = {"cookies"}
-
-    authjwt_access_token_expires: int = timedelta(minutes=10)
+    authjwt_access_token_expires: int = timedelta(minutes=60)
     authjwt_refresh_token_expires: int = timedelta(days=10)
     authjwt_cookie_csrf_protect: bool = False

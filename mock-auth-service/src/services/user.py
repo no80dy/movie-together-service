@@ -1,5 +1,3 @@
-import json
-import logging
 from functools import lru_cache
 
 from db.users import users_db

@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<input type="text" id="client_id" value="{{ client_id }}" hidden>
+
+<div class="conteiner-fluid mx-4">
+	<input type="text" id="user_id" value="{{ user_id }}" hidden>
+	<div class="row">
+		<!-- Film 1 -->
+		<div class=" t1 col-sm-6 col-md-6 col-lg-2 mb-10 mt-2">
+			<button class="btn btn-primary mt-2" onclick="createParty(event)" id="ff083bff-ab7f-4b87-a61f-5678c1d328e5" disabled>Start watch together</button>
+		</div>
+	</div>
+    <div class="row">
+        <h1>Ищем людей для начала совместного просмотра...</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+    </div>
+</div>
+
+<script>
+        let client_id = document.querySelector("#client_id").value;
+
+        let ws = new WebSocket(`ws://localhost/queue-manager-service/api/v1/waiting_party/ws/${client_id}`);
+        ws.onmessage = function(event) {
+            let messages = document.getElementById('messages');
+            if (event.data === '__start_watching__') {
+                window.location.href = 'http://localhost/queue-manager-service/api/v1/queues/start';
+            } else {
+                let message = document.createElement('li')
+                let content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            }
+        };
+        function sendMessage(event) {
+            let input = document.getElementById("messageText")
+            ws.send(input.value)
+            input.value = ''
+            event.preventDefault()
+        }
+</script>
+
+
+{% endblock %}
