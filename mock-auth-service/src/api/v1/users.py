@@ -1,11 +1,7 @@
-import logging
 from http import HTTPStatus
-from typing import Annotated
-from uuid import UUID
 
 from async_fastapi_jwt_auth import AuthJWT
 from core.config import JWTSettings
-from db.users import users_db
 from fastapi import (
     APIRouter,
     Depends,
@@ -16,8 +12,8 @@ from fastapi import (
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
-from models.models import User
 from services.user import UserService, get_user_service
+
 
 security = HTTPBearer()
 router = APIRouter()
