@@ -43,8 +43,7 @@ class JWTBearer(HTTPBearer):
                 status_code=http.HTTPStatus.FORBIDDEN,
                 detail="Invalid or expired token.",
             )
-        # return credentials.credentials
-        return decoded_token
+        return credentials.credentials
 
     @staticmethod
     def parse_token(jwt_token: str) -> Optional[dict]:

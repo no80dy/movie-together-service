@@ -23,8 +23,8 @@ app = FastAPI(
     title=settings.project_name,
     description="Медиа сервер для трансляции HLS-видеопотока",
     version="0.0.0",
-    docs_url="/media-server/api/openapi",
-    openapi_url="/media-server/api/openapi.json",
+    docs_url="/media-service/api/openapi",
+    openapi_url="/media-service/api/openapi.json",
 )
 
 app.add_middleware(

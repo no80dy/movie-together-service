@@ -27,6 +27,7 @@ async def stream_film(
 ):
     party = await party_manager_service.find_party_by_id(party_id=party_id)
     film_id = party["film_id"]
+    print("stream: ", film_id)
     if not party:
         return templates.TemplateResponse(
             "forbidden.html", {"request": request}
